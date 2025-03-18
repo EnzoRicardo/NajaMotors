@@ -14,6 +14,7 @@
         </nav>
     </header>
 
+  
     <div class="login-container">
         <h2>Login</h2>
         <label for="email">E-mail:</label>
@@ -23,9 +24,33 @@
         <input type="password" id="password" name="password" required>
     
         <button onclick="login()">Entrar</button>
+
+
+        <p>Não tem uma conta? <button onclick="toggleForm()">Crie sua conta aqui</button></p>
     </div>
 
 
+    <div class="signup-container" style="display: none;">
+        <h2>Criar Conta</h2>
+        
+        <label for="name">Nome Completo:</label>
+        <input type="text" id="name" name="name" required>
+    
+        <label for="new-email">E-mail:</label>
+        <input type="email" id="new-email" name="new-email" required>
+    
+        <label for="new-password">Senha:</label>
+        <input type="password" id="new-password" name="new-password" required>
+
+        <label for="confirm-password">Confirmar Senha:</label>
+        <input type="password" id="confirm-password" name="confirm-password" required>
+    
+        <button onclick="signup()">Criar Conta</button>
+        
+        <p>Já tem uma conta? <button onclick="toggleForm()">Faça login aqui</button></p>
+    </div>
+
     <script src="login.js"></script>
+
 </body>
 </html>
