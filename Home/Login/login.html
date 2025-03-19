@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naja Motors</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
+
+    <script>
+        // Verifica se o usuário já está logado
+        window.onload = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/check-session', {
+                    credentials: 'include'
+                });
+    
+                const result = await response.json();
+                const loginStatus = document.getElementById('login-status');
+    
+                // Verifica se o elemento existe antes de modificar
+                if (loginStatus) {
+                    loginStatus.textContent = result.loggedIn ? '✅' : '❌';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar a sessão:', error);
+            }
+        };
+    
+        const login = async () => {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+    
+            if (!email || !senha) {
+                alert("Os campos são obrigatórios.");
+                return;
+            }
+    
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Permite envio do cookie
+                body: JSON.stringify({ email, senha })
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                alert(result.message);
+                window.location.href = '../index.html';
+            } else {
+                alert(result.message);
+            }
+        };
+    </script>
+
+
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="index.html"> <img src="../IMG/Logo NM.png" alt="NM"> </a>
+        </nav>
+    </header>
+
+  
+    <div class="login-container">
+        <h2>Login</h2>
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+    
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required>
+    
+        <button onclick="login()">Entrar</button>
+
+
+        <p>Não tem uma conta? <a href="../cadastre.html">Crie sua conta aqui</a></p>
+    </div>
+
+</body>
+</html>
