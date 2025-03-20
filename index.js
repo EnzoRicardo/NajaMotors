@@ -103,9 +103,9 @@ app.delete('/api/usuarios/:id', (req, res) => {
 // Rota para atualizar um usuário
 app.put('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
-    const { email, senha } = req.body;
+    const { nome, email, senha } = req.body;
 
-    db.query('UPDATE usuarios SET email = ?, senha = ? WHERE id = ?', [email, senha, id], (err, results) => {
+    db.query('UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?', [nome, email, senha, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar usuário.' });
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     });
@@ -114,14 +114,14 @@ app.put('/api/usuarios/:id', (req, res) => {
 
 
 app.post('/api/cadastrarU', (req, res) => {
-    const { email, senha } = req.body;
+    const { nome, email, senha } = req.body;
 
-    if (!email || !senha) {
+    if (!nome || !email || !senha) {
         return res.status(400).json({ message: 'Os campos são obrigatórios.' });
     }
 
     // Inserir usuário no banco de dados
-    db.query('INSERT INTO usuarios (email, senha) VALUES (?, ?)', [email, senha], (err, results) => {
+    db.query('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', [nome, email, senha], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
         res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
     });
