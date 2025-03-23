@@ -5,6 +5,7 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link href="cadastro.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         const cadastrarU = async () => {
@@ -12,17 +13,31 @@
             const senha = document.getElementById('senha').value;
             const confirmarSenha = document.getElementById('confirmarSenha').value;
             const nome = document.getElementById('nome').value;
-    
-            if (!nome || !email || !senha || !confirmarSenha) {
-                alert("Os campos são obrigatórios.");
+
+            let erro = "";
+
+            switch (true) {
+                case !nome || !email || !senha || !confirmarSenha:
+                    erro = "Os campos são obrigatórios.";
+                    break;
+                case senha !== confirmarSenha:
+                    erro = "As senhas não coincidem.";
+                    break;
+            }
+
+            if (erro) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: erro,
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "OK"
+                });
                 return;
             }
 
-            if (senha != confirmarSenha) {
-                alert("As senhas não coincidem.");
-                return;
-            }
-    
+
+
             const response = await fetch('http://localhost:3000/api/cadastrarU', {
                 method: 'POST',
                 headers: {
@@ -30,9 +45,9 @@
                 },
                 body: JSON.stringify({ nome, email, senha })
             });
-    
+
             const result = await response.json();
-    
+
             if (response.ok) {
                 alert(result.message);
                 // Redirecionar ou realizar outra ação após cadastro
@@ -51,21 +66,21 @@
         </nav>
     </header>
 
-  
+
     <div class="login-container">
         <h2>Cadastro</h2>
         <label for="nome">Nome:</label>
         <input type="name" id="nome" name="nome" required>
-    
+
         <label for="email">E-mail:</label>
         <input type="email" id="email" name="email" required>
 
         <label for="senha">Senha:</label>
         <input type="password" id="senha" name="senha" required>
-        
+
         <label for="confirmarSenha">Confirme a Senha:</label>
         <input type="password" id="confirmarSenha" name="confirmarSenha" required>
-    
+
         <button onclick="cadastrarU()">Entrar</button>
 
 
