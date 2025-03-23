@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.onload = async () => {
             try {
@@ -54,15 +55,32 @@
                 const result = await response.json();
     
                 if (response.ok) {
-                    alert(result.message);
-                    window.location.reload(); // Atualiza página após logout
-                } else {
-                    alert('Erro ao sair.');
-                }
-            } catch (error) {
-                console.error('Erro ao realizar logout:', error);
+                    Swal.fire({
+                        icon: 'sucess',
+                        title: 'Sucesso!',
+                        text: result.message,
+                        confirmButtonColor: '#3085d6'
+                    }).then(() => {
+                        window.location.reload();
+                    })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro ao sair.',
+                    confirmButtonColor: '#d33'
+                });
             }
-        };
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Erro ao realizar logout. Verifique o console para mais detalhes.',
+                confirmButtonColor: '#d33'
+            });
+            console.error('Erro ao realizar logout:', error);
+        }
+    };
     </script>
 
 
