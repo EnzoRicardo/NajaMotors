@@ -33,6 +33,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
     const listar = async () => {
@@ -48,7 +49,7 @@
           <td>${usuario.nome}</td>
           <td>${usuario.email}</td>
           <td>
-            <button class="btn btn-warning" onclick="editar(${usuario.id}, '${usuario.email}', '${usuario.nome}')">Editar</button>
+            <button class="btn btn-warning" onclick="editar(${usuario.id}, '${usuario.email}', '${usuario.nome}', '${usuario.senha}')">Editar</button>
             <button class="btn btn-danger" onclick="excluir(${usuario.id})">Excluir</button>
           </td>
         `;
@@ -65,42 +66,64 @@
       }
     };
 
-    const editar = (id, email, nome) => {
-      const novoEmail = prompt('Editar Email:', email);
-      if (!novoEmail) {
-        alert('O email não pode ficar vazio!');
-        return;
-      }
+    const editar = (id, email, nome, senha) => {
+      Swal.fire({
+        title: 'Editar Usuário',
+        html: `
+          <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
+          <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
+          <input id="swal-senha" class="swal2-input" placeholder="Senha" value="${senha}">
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Salvar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+          const novoEmail = document.getElementById('swal-email').value;
+          const novoNome = document.getElementById('swal-nome').value;
+          const novaSenha = document.getElementById('swal-senha').value;
 
-      const novoNome = prompt('Editar Nome:', nome);
-      if (!novoNome) {
-        alert('O nome não pode ficar vazio!');
-        return;
-      }
+          if (!novoEmail || !novoNome || !novaSenha) {
+            Swal.showValidationMessage('Todos os campos são obrigatórios!');
+            return false;
+          }
 
-      const novaSenha = prompt('Editar Senha:', senha);
-      if (!novaSenha) {
-        alert('A senha não pode ficar vazia!');
-        return;
-      }
+          return { novoEmail, novoNome, novaSenha };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const { novoEmail, novoNome, novaSenha } = result.value;
 
-      fetch(`http://localhost:3000/api/usuarios/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: novoEmail,
-          nome: novoNome,
-          senha: novaSenha
-        })
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Falha ao atualizar o usuário.');
-        listar(); // Atualiza a lista após a edição
-      })
-      .catch(error => alert(error.message));
-  };
+          fetch(`http://localhost:3000/api/usuarios/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: novoEmail,
+              nome: novoNome,
+              senha: novaSenha
+            })
+          })
+          .then(response => {
+            if (!response.ok) throw new Error('Falha ao atualizar o usuário.');
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso!',
+              text: 'Usuário atualizado com sucesso!',
+              confirmButtonColor: '#3085d6'
+            });
+            listar(); // Atualiza a lista após a edição
+          })
+          .catch(error => Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: error.message,
+            confirmButtonColor: '#d33'
+          }));
+        }
+      });
+    };
 
 
     listar(); // Chama a função ao carregar a página
