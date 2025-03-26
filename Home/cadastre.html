@@ -25,6 +25,24 @@
                     break;
             }
 
+            // Validação de senha
+            const regexSenha = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+            if (!regexSenha.test(senha)) {
+                erro = "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.";
+            }
+
+            // Validação de nome
+            const regexNome = /^[A-Za-zÀ-ÿ\s]+$/; // Permite letras (maiúsculas e minúsculas), acentos e espaços
+            if (!regexNome.test(nome)) {
+                erro = "O nome não pode conter números ou caracteres especiais inválidos.";
+            }
+
+            // Validação de email
+            const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!regexEmail.test(email)) {
+                erro = "Por favor, insira um email válido.";
+            }
+
             if (erro) {
                 Swal.fire({
                     icon: "error",
