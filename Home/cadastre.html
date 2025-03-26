@@ -26,7 +26,7 @@
             }
 
             // Validação de senha
-            const regexSenha = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+            const regexSenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
             if (!regexSenha.test(senha)) {
                 erro = "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.";
             }
@@ -74,7 +74,7 @@
                     confirmButtonColor: "#3085d6",
                     confirmButtonText: "OK"
                 }).then(() => {
-                    // Redirecionar ou realizar outra ação após cadastro
+                    window.location.href = '/Login/login.html';
                 });
             } else {
                 Swal.fire({
