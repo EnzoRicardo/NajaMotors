@@ -24,6 +24,7 @@
           <th scope="col">ID</th>
           <th scope="col">Nome</th>
           <th scope="col">Email</th>
+          <th scope="col">Ano</th>
           <th scope="col">Ações</th>
         </tr>
       </thead>
@@ -48,8 +49,9 @@
           <td>${usuario.id}</td>
           <td>${usuario.nome}</td>
           <td>${usuario.email}</td>
+          <td>${usuario.ano}</td>
           <td>
-            <button class="btn btn-warning" onclick="editar(${usuario.id}, '${usuario.email}', '${usuario.nome}', '${usuario.senha}')">Editar</button>
+            <button class="btn btn-warning" onclick="editar(${usuario.id}, '${usuario.email}', '${usuario.nome}', '${usuario.ano}'  ,'${usuario.senha}' )">Editar</button>
             <button class="btn btn-danger" onclick="excluir(${usuario.id})">Excluir</button>
           </td>
         `;
@@ -66,13 +68,14 @@
       }
     };
 
-    const editar = (id, email, nome, senha) => {
+    const editar = (id, email, nome, senha, ano) => {
       Swal.fire({
         title: 'Editar Usuário',
         html: `
           <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
           <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
           <input id="swal-senha" class="swal2-input" placeholder="Senha" value="${senha}">
+          <input id="swal-ano" class="swal2-input" placeholder="Ano" value="${ano}">
         `,
         focusConfirm: false,
         showCancelButton: true,
@@ -82,6 +85,7 @@
           const novoEmail = document.getElementById('swal-email').value;
           const novoNome = document.getElementById('swal-nome').value;
           const novaSenha = document.getElementById('swal-senha').value;
+          const novoAno = document.getElementById('swal-ano').value;
 
           // Validação de email
           const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -104,16 +108,16 @@
             return false;
           }
 
-          if (!novoEmail || !novoNome || !novaSenha) {
+          if (!novoEmail || !novoNome || !novaSenha || !novoAno) {
             Swal.showValidationMessage('Todos os campos são obrigatórios!');
             return false;
           }
 
-          return { novoEmail, novoNome, novaSenha };
+          return { novoEmail, novoNome, novaSenha, novoAno };
         }
       }).then((result) => {
         if (result.isConfirmed) {
-          const { novoEmail, novoNome, novaSenha } = result.value;
+          const { novoEmail, novoNome, novaSenha, novoAno } = result.value;
 
           fetch(`http://localhost:3000/api/usuarios/${id}`, {
             method: 'PUT',
@@ -123,7 +127,8 @@
             body: JSON.stringify({
               email: novoEmail,
               nome: novoNome,
-              senha: novaSenha
+              senha: novaSenha,
+              ano: novoAno
             })
           })
           .then(response => {
