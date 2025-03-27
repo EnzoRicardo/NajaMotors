@@ -13,11 +13,12 @@
             const senha = document.getElementById('senha').value;
             const confirmarSenha = document.getElementById('confirmarSenha').value;
             const nome = document.getElementById('nome').value;
+            const cpf = document.getElementById('cpf').value;
 
             let erro = "";
 
             switch (true) {
-                case !nome || !email || !senha || !confirmarSenha:
+                case !nome || !email || !cpf || !senha || !confirmarSenha:
                     erro = "Os campos são obrigatórios.";
                     break;
                 case senha !== confirmarSenha:
@@ -61,7 +62,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ nome, email, senha })
+                body: JSON.stringify({ nome, email, cpf, senha })
             });
 
             const result = await response.json();
@@ -107,11 +108,14 @@
         <label for="email">E-mail:</label>
         <input type="email" id="email" name="email" required>
 
+        <label for="cpf">CPF:</label>
+        <input type="cpf" id="cpf" name="cpf" required>
+
         <label for="senha">Senha:</label>
-        <input type="password" id="senha" name="senha" required>
+        <input type="senha" id="senha" name="senha" required>
 
         <label for="confirmarSenha">Confirme a Senha:</label>
-        <input type="password" id="confirmarSenha" name="confirmarSenha" required>
+        <input type="senha" id="confirmarSenha" name="confirmarSenha" required>
 
         <button onclick="cadastrarU()">Entrar</button>
 
