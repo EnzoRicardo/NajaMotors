@@ -24,6 +24,7 @@
           <th scope="col">ID</th>
           <th scope="col">Nome</th>
           <th scope="col">Email</th>
+          <th scope="col">CPF</th>
           <th scope="col">Ações</th>
         </tr>
       </thead>
@@ -48,8 +49,9 @@
           <td>${usuario.id}</td>
           <td>${usuario.nome}</td>
           <td>${usuario.email}</td>
+          <td>${usuario.cpf}</td>
           <td>
-            <button class="btn btn-warning" onclick="editar(${usuario.id}, '${usuario.email}', '${usuario.nome}', '${usuario.senha}')">Editar</button>
+            <button class="btn btn-warning" onclick="editar(${usuario.id}, '${usuario.email}', '${usuario.nome}', '${usuario.cpf}','${usuario.senha}')">Editar</button>
             <button class="btn btn-danger" onclick="excluir(${usuario.id})">Excluir</button>
           </td>
         `;
@@ -72,6 +74,7 @@
         html: `
           <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
           <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
+          <input id="swal-nome" class="swal2-input" placeholder="Cpf" value="${cpf}">
           <input id="swal-senha" class="swal2-input" placeholder="Senha" value="${senha}">
         `,
         focusConfirm: false,
@@ -81,6 +84,7 @@
         preConfirm: () => {
           const novoEmail = document.getElementById('swal-email').value;
           const novoNome = document.getElementById('swal-nome').value;
+          const novoCPF = document.getElementById('swal-cpf').value;
           const novaSenha = document.getElementById('swal-senha').value;
 
           // Validação de email
@@ -104,16 +108,16 @@
             return false;
           }
 
-          if (!novoEmail || !novoNome || !novaSenha) {
+          if (!novoEmail || !novoNome || !novoCPF || !novaSenha) {
             Swal.showValidationMessage('Todos os campos são obrigatórios!');
             return false;
           }
 
-          return { novoEmail, novoNome, novaSenha };
+          return { novoEmail, novoNome, novoCPF, novaSenha };
         }
       }).then((result) => {
         if (result.isConfirmed) {
-          const { novoEmail, novoNome, novaSenha } = result.value;
+          const { novoEmail, novoNome, novoCPF, novaSenha } = result.value;
 
           fetch(`http://localhost:3000/api/usuarios/${id}`, {
             method: 'PUT',
@@ -123,6 +127,7 @@
             body: JSON.stringify({
               email: novoEmail,
               nome: novoNome,
+              cpf: novoCPF,
               senha: novaSenha
             })
           })
@@ -146,7 +151,7 @@
       });
     };
 
-
+      listar();
     
   </script>
 </body>
