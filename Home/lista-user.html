@@ -68,13 +68,13 @@
       }
     };
 
-    const editar = (id, email, nome, senha) => {
+    const editar = (id, email, nome, cpf, senha) => {
       Swal.fire({
         title: 'Editar Usuário',
         html: `
           <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
           <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
-          <input id="swal-nome" class="swal2-input" placeholder="Cpf" value="${cpf}">
+          <input id="swal-cpf" class="swal2-input" placeholder="Cpf" value="${cpf}">
           <input id="swal-senha" class="swal2-input" placeholder="Senha" value="${senha}">
         `,
         focusConfirm: false,
