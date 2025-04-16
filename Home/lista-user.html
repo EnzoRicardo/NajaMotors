@@ -37,21 +37,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Acesso negado',
-        text: 'Você precisa estar logado para acessar esta página.',
-        confirmButtonText: 'Fazer login'
-      }).then(() => {
-        window.location.href = './Login/login.html';
-      });
-    }
-
-
-
     const listar = async () => {
       const response = await fetch('http://localhost:3000/api/usuarios', {
         method: 'GET',
@@ -79,23 +64,40 @@
       });
     };
 
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Acesso negado',
+        text: 'Você precisa estar logado para acessar esta página.',
+        confirmButtonText: 'Fazer login'
+      }).then(() => {
+        window.location.href = './Login/login.html';
+      });
+    } else {
+      listar();
+    }
+
     const excluir = async (id) => {
       if (confirm('Tem certeza que deseja excluir este usuário?')) {
         await fetch(`http://localhost:3000/api/usuarios/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         listar(); // Atualiza a lista após a exclusão
       }
     };
 
-    const editar = (id, email, nome, cpf, senha) => {
+    const editar = (id, email, nome, cpf) => {
       Swal.fire({
         title: 'Editar Usuário',
         html: `
           <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
           <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
           <input id="swal-cpf" class="swal2-input" placeholder="Cpf" value="${cpf}">
-          <input id="swal-senha" class="swal2-input" placeholder="Senha" value="${senha}">
         `,
         focusConfirm: false,
         showCancelButton: true,
@@ -105,7 +107,6 @@
           const novoEmail = document.getElementById('swal-email').value;
           const novoNome = document.getElementById('swal-nome').value;
           const novoCPF = document.getElementById('swal-cpf').value;
-          const novaSenha = document.getElementById('swal-senha').value;
 
           // Validação de email
           const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -121,34 +122,27 @@
             return false;
           }
 
-          // Validação de senha
-          const regexSenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
-          if (!regexSenha.test(novaSenha)) {
-            Swal.showValidationMessage('A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.');
-            return false;
-          }
-
-          if (!novoEmail || !novoNome || !novoCPF || !novaSenha) {
+          if (!novoEmail || !novoNome || !novoCPF ) {
             Swal.showValidationMessage('Todos os campos são obrigatórios!');
             return false;
           }
 
-          return { novoEmail, novoNome, novoCPF, novaSenha };
+          return { novoEmail, novoNome, novoCPF };
         }
       }).then((result) => {
         if (result.isConfirmed) {
-          const { novoEmail, novoNome, novoCPF, novaSenha } = result.value;
+          const { novoEmail, novoNome, novoCPF } = result.value;
 
           fetch(`http://localhost:3000/api/usuarios/${id}`, {
             method: 'PUT',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
               email: novoEmail,
               nome: novoNome,
               cpf: novoCPF,
-              senha: novaSenha
             })
           })
           .then(response => {
@@ -170,8 +164,6 @@
         }
       });
     };
-
-      listar();
     
   </script>
 </body>

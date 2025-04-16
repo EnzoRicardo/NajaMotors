@@ -8,6 +8,8 @@
     <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+
 
 
 </head>
@@ -19,13 +21,12 @@
                 <li><a href="#about">Sobre</a></li>
                 <li><a href="#models">Modelos</a></li>
                 <li><a href="lista-user.html">CRUD</a></li>
-                <li id="admin-link" style="display: none;"><a href="cadastroproduto.html">Carros</a></li>
                 <li><a href="#">Fale Conosco</a></li>
+                <li><a id="nomeUsuario"></a></li>
             </ul>
-
-            <span id="login-status" class="login-status">❌</span>
             
             <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
+            <a href="./Login/login.html" class="login-btn" id="logout-btn" onclick="logout()">Logout</a>
         </nav>
     </header>
 
@@ -67,5 +68,27 @@
     <button id="backToTop">⬆</button>
 
     <script src="script.js"></script>
+    <script>
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                const decodedToken = jwt_decode(token);
+                const nomeUsuario = decodedToken.nome;
+
+                document.getElementById('nomeUsuario').textContent = `Login: ${nomeUsuario}`;
+
+                document.getElementById('login-btn').style.display = 'none';
+            } else {
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('login-btn').style.display = 'inline-block';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -43,7 +43,7 @@ app.post('/api/login', (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: usuario.id, email: usuario.email },
+            { id: usuario.id, email: usuario.email, nome: usuario.nome },
             secret,
             { expiresIn: '1h' }
         );
@@ -61,7 +61,7 @@ app.get('/api/usuarios', (req, res) => {
 });
 
 // API Delete
-app.delete('/api/usuarios/:id', (req, res) => {
+app.delete('/api/usuarios/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM usuarios WHERE id = ?', [id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao excluir usuário.' });
@@ -70,7 +70,7 @@ app.delete('/api/usuarios/:id', (req, res) => {
 });
 
 // API Update
-app.put('/api/usuarios/:id', (req, res) => {
+app.put('/api/usuarios/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     const { nome, email, cpf, senha } = req.body;
 
