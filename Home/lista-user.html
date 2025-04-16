@@ -37,8 +37,28 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Acesso negado',
+        text: 'Você precisa estar logado para acessar esta página.',
+        confirmButtonText: 'Fazer login'
+      }).then(() => {
+        window.location.href = './Login/login.html';
+      });
+    }
+
+
+
     const listar = async () => {
-      const response = await fetch('http://localhost:3000/api/usuarios');
+      const response = await fetch('http://localhost:3000/api/usuarios', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const usuarios = await response.json();
       const tabelaBody = document.querySelector('#tabelaUsuario tbody');
       tabelaBody.innerHTML = '';
