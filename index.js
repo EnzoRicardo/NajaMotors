@@ -72,9 +72,9 @@ app.delete('/api/usuarios/:id', verifyToken, (req, res) => {
 // API Update
 app.put('/api/usuarios/:id', verifyToken, (req, res) => {
     const { id } = req.params;
-    const { nome, email, cpf, senha } = req.body;
+    const { nome, email, cpf } = req.body;
 
-    db.query('UPDATE usuarios SET nome = ?, email = ?, cpf = ?, senha = ? WHERE id = ?', [nome, email, cpf, senha, id], (err, results) => {
+    db.query('UPDATE usuarios SET nome = ?, email = ?, cpf = ? WHERE id = ?', [nome, email, cpf, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar usuário.' });
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     });
