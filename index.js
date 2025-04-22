@@ -2,17 +2,26 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-
-const secret = 'ola';
+const session = require('express-session');
+const { message } = require('statuses');
 const app = express();
 
-app.use(cors());
 
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.static('./Home'));
+
+app.use(session({
+    secret: 'carro',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60
+    }
+}));
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -42,13 +51,13 @@ app.post('/api/login', (req, res) => {
             return res.status(401).json({message: 'Senha incorreta.'})
         }
 
-        const token = jwt.sign(
-            { id: usuario.id, email: usuario.email, nome: usuario.nome },
-            secret,
-            { expiresIn: '1h' }
-        );
+        req.session.user = {
+            id: usuario.id,
+            name: usuario.nome,
+            email: usuario.email
+        }
 
-        return res.status(200).json({ message: "Logado com sucesso", token });
+        return res.status(200).json({ message: "Logado com sucesso"});
     })
 });
 
@@ -61,7 +70,7 @@ app.get('/api/usuarios', (req, res) => {
 });
 
 // API Delete
-app.delete('/api/usuarios/:id', verifyToken, (req, res) => {
+app.delete('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM usuarios WHERE id = ?', [id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao excluir usuário.' });
@@ -70,7 +79,7 @@ app.delete('/api/usuarios/:id', verifyToken, (req, res) => {
 });
 
 // API Update
-app.put('/api/usuarios/:id', verifyToken, (req, res) => {
+app.put('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
     const { nome, email, cpf } = req.body;
 
@@ -162,26 +171,27 @@ app.post('/api/cadastrarP', (req, res) => {
     });
 });
 
-
-function verifyToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: 'Token não fornecido.'});
-    }
-
-    jwt.verify(token, secret, (err, user) => {
-        if(err) return res.status(403).json({message: 'Token inválido'});
-
-        req.user = user;
-        next();
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(err => {
+        if(err) {
+            return res.status(500).json({ message: 'Erro ao fazer logout. '});
+        }
+        res.json({ message: 'Logout realizado. '});
     })
+})
+
+function authMiddleware(req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401).json({ message: 'Não autorizado' });
+    }
 }
 
-app.get('/api/protegido', verifyToken, (req, res) => {
-    res.json({ message: 'Você acessou uma rota protegido!', user: req.user });
-});
+
+app.get('/api/usuario', authMiddleware, (req, res) => {
+    res.json({usuario: req.session.user})
+})
 
 const port = 3000;
 app.listen(port, () => {

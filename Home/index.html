@@ -69,26 +69,48 @@
 
     <script src="script.js"></script>
     <script>
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
-        }
-
-        window.onload = function() {
-            const token = localStorage.getItem('token');
-
-            if (token) {
-                const decodedToken = jwt_decode(token);
-                const nomeUsuario = decodedToken.nome;
-
-                document.getElementById('nomeUsuario').textContent = `Login: ${nomeUsuario}`;
-
-                document.getElementById('login-btn').style.display = 'none';
+        window.onload = async () => {
+          try {
+            const res = await fetch('http://localhost:3000/api/usuario', {
+              credentials: 'include'
+            });
+      
+            if (res.ok) {
+              const data = await res.json();
+              const nome = data.usuario.name;
+              document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
+              
+              // Exibe o botão de logout, esconde o de login
+              document.getElementById('login-btn').style.display = 'none';
+              document.getElementById('logout-btn').style.display = 'inline-block';
             } else {
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('login-btn').style.display = 'inline-block';
+              // Se não estiver logado, esconde logout
+              document.getElementById('logout-btn').style.display = 'none';
+              document.getElementById('login-btn').style.display = 'inline-block';
             }
+          } catch (error) {
+            console.error('Erro ao buscar usuário:', error);
+          }
+        };
+      
+        // Função de logout
+        async function logout() {
+          const res = await fetch('http://localhost:3000/api/logout', {
+            method: 'POST',
+            credentials: 'include'
+          });
+      
+          if (res.ok) {
+            window.location.href = './Login/login.html';
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: 'Falha ao fazer logout.'
+            });
+          }
         }
-    </script>
+      </script>
+      
 </body>
 </html>

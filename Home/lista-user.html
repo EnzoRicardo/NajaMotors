@@ -37,12 +37,29 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    window.onload = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/api/usuario', {
+          credentials: 'include'
+        });
+
+        if (!res.ok) {
+          window.location.href = './Login/login.html'
+          return;
+        }
+
+        
+
+        listar();
+
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+        window.location.href = './Login/login.html'
+      }
+    }
     const listar = async () => {
       const response = await fetch('http://localhost:3000/api/usuarios', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
       const usuarios = await response.json();
       const tabelaBody = document.querySelector('#tabelaUsuario tbody');
@@ -64,28 +81,10 @@
       });
     };
 
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Acesso negado',
-        text: 'Você precisa estar logado para acessar esta página.',
-        confirmButtonText: 'Fazer login'
-      }).then(() => {
-        window.location.href = './Login/login.html';
-      });
-    } else {
-      listar();
-    }
-
     const excluir = async (id) => {
       if (confirm('Tem certeza que deseja excluir este usuário?')) {
         await fetch(`http://localhost:3000/api/usuarios/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          method: 'DELETE'
         });
         listar(); // Atualiza a lista após a exclusão
       }
@@ -137,7 +136,7 @@
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+              
             },
             body: JSON.stringify({
               email: novoEmail,
