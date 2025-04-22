@@ -1,11 +1,47 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link href="cadastro.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="../index.html"> <img src="../IMG/Logo NM.png" alt="NM"> </a>
+        </nav>
+    </header>
+
+    <div class="login-container">
+        <h2>Cadastro</h2>
+
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required>
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="cpf">CPF:</label>
+        <input type="text" id="cpf" name="cpf" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required>
+
+        <label for="confirmarSenha">Confirme a Senha:</label>
+        <input type="password" id="confirmarSenha" name="confirmarSenha" required>
+
+        <button onclick="cadastrarU()">Cadastrar</button>
+
+        <p>Já tem uma conta? <a href="Login/login.html">Faça seu login aqui</a></p>
+    </div>
 
     <script>
         const cadastrarU = async () => {
@@ -18,7 +54,7 @@
             let erro = "";
 
             switch (true) {
-                case !nome || !email|| !cpf || !senha || !confirmarSenha:
+                case !nome || !email || !cpf || !senha || !confirmarSenha:
                     erro = "Os campos são obrigatórios.";
                     break;
                 case senha !== confirmarSenha:
@@ -26,23 +62,20 @@
                     break;
             }
 
-            // Validação de senha
             const regexSenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
             if (!regexSenha.test(senha)) {
                 erro = "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.";
             }
 
-            // Validação de nome
-            const regexNome = /^[A-Za-zÀ-ÿ\s]+$/; // Permite letras (maiúsculas e minúsculas), acentos e espaços
+            const regexNome = /^[A-Za-zÀ-ÿ\s]+$/;
             if (!regexNome.test(nome)) {
                 erro = "O nome não pode conter números ou caracteres especiais inválidos.";
             }
 
-            // Validação de email
             const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             if (!regexEmail.test(email)) {
                 erro = "Por favor, insira um email válido.";
-            }
+            }
 
             if (erro) {
                 Swal.fire({
@@ -54,8 +87,6 @@
                 });
                 return;
             }
-
-
 
             const response = await fetch('http://localhost:3000/api/cadastrarU', {
                 method: 'POST',
@@ -86,43 +117,8 @@
                     confirmButtonText: "OK"
                 });
             }
-
         }
     </script>
-</head>
-
-
-<body>
-    <header>
-        <nav>
-            <a class="logo" href="../index.html"> <img src="../IMG/Logo NM.png" alt="NM"> </a>
-        </nav>
-    </header>
-
-
-    <div class="login-container">
-        <h2>Cadastro</h2>
-        <label for="nome">Nome:</label>
-        <input type="name" id="nome" name="nome" required>
-
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="cpf">CPF:</label>
-        <input type="cpf" id="cpf" name="cpf" required>
-
-        <label for="senha">Senha:</label>
-        <input type="senha" id="senha" name="senha" required>
-
-        <label for="confirmarSenha">Confirme a Senha:</label>
-        <input type="senha" id="confirmarSenha" name="confirmarSenha" required>
-
-        <button onclick="cadastrarU()">Entrar</button>
-
-
-        <p>Ja tem uma conta? <a href="Login/login.html">Faça seu login aqui</a></p>
-    </div>
-
 </body>
 
 </html>
