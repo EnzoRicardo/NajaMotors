@@ -68,7 +68,7 @@
       <ul class="nav-list" id="navList">
         <li><a href="#about">Sobre</a></li>
         <li><a href="#models">Modelos</a></li>
-        <li><a href="lista-user.html">CRUD</a></li>
+        <li><a href="crud.html">CRUD</a></li>
         <li><a href="#">Fale Conosco</a></li>
         <li><a id="nomeUsuario"></a></li>
       </ul>
@@ -128,7 +128,7 @@
         if (res.ok) {
           const data = await res.json();
           const nome = data.usuario.name;
-          document.getElementById('nomeUsuario').innerText = Bem-vindo, ${nome};
+          document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
           document.getElementById('login-btn').style.display = 'none';
           document.getElementById('logout-btn').style.display = 'inline-block';
         } else {

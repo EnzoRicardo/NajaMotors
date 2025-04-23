@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD de Usuários - Naja Motors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="crud.css">
+    <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="../index.html">
+                <img src="../IMG/Logo NM.png" alt="NM">
+            </a>
+        </nav>
+    </header>
+
+    <div class="crud-container">
+        <h2>Lista de Usuários</h2>
+        <button class="cadastrar" onclick="cadastrarUsuario()">Cadastrar</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>CPF</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+                <!-- Conteúdo dinâmico será inserido aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const lista = document.getElementById('user-list');
+
+
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, ''); // Remove tudo que não for número
+
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+                return false; // CPF com tamanho inválido ou todos dígitos iguais
+            }
+
+            let soma = 0;
+
+            // Valida primeiro dígito
+            for (let i = 0; i < 9; i++) {
+                soma += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.charAt(9))) return false;
+
+            // Valida segundo dígito
+            soma = 0;
+            for (let i = 0; i < 10; i++) {
+                soma += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            resto = (soma * 10) % 11;
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.charAt(10))) return false;
+
+            return true;
+        }
+
+
+        document.addEventListener('input', function (e) {
+            if (e.target.id === 'swal-cpf') {
+                let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+
+                if (value.length > 11) value = value.slice(0, 11); // Limita a 11 dígitos
+
+                // Aplica a máscara: 000.000.000-00
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+                e.target.value = value;
+            }
+        });
+
+        const carregar = async () => {
+            try {
+
+                lista.innerHTML = '';
+
+                const response = await fetch('http://localhost:3000/api/usuarios', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    /* crendetials: true para cookies*/
+                });
+
+                if (!response.ok) throw new Error('Erro ao buscar usuários');
+
+                const usuarios = await response.json();
+
+                usuarios.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.nome}</td>
+                    <td>${user.email}</td>
+                    <td>${user.cpf}</td>
+                    <td>
+                        <button class="editar" onclick="editarUsuario(${user.id})">Editar</button>
+                        <button class="deletar" onclick="deletarUsuario(${user.id})">Excluir</button>
+                    </td>
+                    `;
+                    lista.appendChild(row);
+                })
+            } catch (error) {
+                console.error("Erro", error);
+                Swal.fire({
+                icon: "error",
+                title: "Erro ao carregar usuários",
+                text: error.message
+                });
+            }
+        };
+
+        window.onload = carregar;
+
+        const editarUsuario = async (id) => {
+            // Pegando a linha com base no ID do usuário
+            const userRow = Array.from(document.querySelectorAll('tr')).find(row => row.cells[0].textContent == id);
+
+            if (!userRow) {
+                Swal.fire('Erro', 'Usuário não encontrado.', 'error');
+                return;
+            }
+
+            // Pegando os dados atuais
+            const nome = userRow.children[1].textContent;
+            const email = userRow.children[2].textContent;
+            const cpf = userRow.children[3].textContent;
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Editar Usuário',
+                html: `
+                    <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
+                    <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
+                    <input id="swal-cpf" class="swal2-input" placeholder="CPF" value="${cpf}">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const nome = document.getElementById('swal-nome').value.trim();
+                    const email = document.getElementById('swal-email').value.trim();
+                    const cpf = document.getElementById('swal-cpf').value.trim();
+
+                    const nomeRegex = /^[A-Za-zÀ-ÿ\s]{3,}$/;
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
+
+                    if (!validarCPF(cpf)) {
+                        Swal.showValidationMessage('CPF inválido!');
+                        return false
+                    }
+
+                    if (!nomeRegex.test(nome)) {
+                        Swal.showValidationMessage("Nome inválido. Use apenas letras e no mínimo 3 caracteres.");
+                        return false;
+                    }
+
+                    if (!emailRegex.test(email)) {
+                        Swal.showValidationMessage("Email inválido.");
+                        return false;
+                    }
+
+                    if (!cpfRegex.test(cpf)) {
+                        Swal.showValidationMessage("CPF inválido. Ex: 123.456.789-00");
+                        return false;
+                    }
+
+                    return { nome, email, cpf };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Atualizado!", result.message, "success");
+                        carregar(); // Recarrega a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível atualizar o usuário.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+
+
+        const deletarUsuario = async (id) => {
+            const confirmar = await Swal.fire({
+                title: "Tem certeza?",
+                text: "Você realmente deseja excluir esse usuário?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir",
+                cancelButtonText: "Cancelar"
+            });
+
+            if (confirmar.isConfirmed) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Excluído!", result.message, "success");
+                        carregar(); // Atualiza a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Erro","Não foi possível excluir o usuário.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+        const cadastrarUsuario = async () => {
+            const { value: formValues } = await Swal.fire({
+                title: 'Cadastrar Novo Usuário',
+                html: `
+                    <input id="swal-nome" class="swal2-input" placeholder="Nome">
+                    <input id="swal-email" class="swal2-input" placeholder="Email">
+                    <input id="swal-cpf" class="swal2-input" placeholder="CPF">
+                    <input id="swal-senha" class="swal2-input" placeholder="Senha">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const nome = document.getElementById('swal-nome').value.trim();
+                    const email = document.getElementById('swal-email').value.trim();
+                    const cpf = document.getElementById('swal-cpf').value.trim();
+                    const senha = document.getElementById('swal-senha').value.trim();
+
+                    const nomeRegex = /^[A-Za-zÀ-ÿ\s]{3,}$/;
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
+                    const senhaRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/
+
+                    if (!validarCPF(cpf)) {
+                        Swal.showValidationMessage('CPF inválido!');
+                        return false
+                    }
+
+                    if (!nomeRegex.test(nome)) {
+                        Swal.showValidationMessage("Nome inválido. Use apenas letras e no mínimo 3 caracteres.");
+                        return false;
+                    }
+
+                    if (!emailRegex.test(email)) {
+                        Swal.showValidationMessage("Email inválido.");
+                        return false;
+                    }
+
+                    if (!cpfRegex.test(cpf)) {
+                        Swal.showValidationMessage("CPF inválido. Ex: 123.456.789-00");
+                        return false;
+                    }
+
+                    if (!senhaRegex.test(senha)) {
+                        Swal.showValidationMessage("Senha fraca, tenha pelo menos 8 digitos, 1 número e 1 caracter especial");
+                        return false;
+                    }
+
+                    return { nome, email, cpf, senha };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/cadastrarU', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Sucesso!", result.message, "success");
+                        carregar(); // Recarrega a lista de usuários
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível cadastrar o usuário.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+
+    </script>
+</body>
+</html>

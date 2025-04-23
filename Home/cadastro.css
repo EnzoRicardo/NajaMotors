@@ -7,6 +7,12 @@
     font-family: 'Poppins', sans-serif;
 }
 
+input[type="checkbox"]#mostrarSenha {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+
 html {
     scroll-behavior: smooth;
 }
