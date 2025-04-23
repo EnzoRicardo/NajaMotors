@@ -37,7 +37,7 @@ app.post('/api/login', (req, res) => {
         return res.status(400).json({ message: 'Os campos são obrigatórios.' });
     }
 
-    const q = `SELECT * FROM usuarios WHERE email = ?`
+    const q = `SELECT * FROM usuario WHERE email = ?`
     
     db.query(q, [email], async (err,data) => {
         if (err) return res.status(500).json(err)
@@ -63,7 +63,7 @@ app.post('/api/login', (req, res) => {
 
 // API listar
 app.get('/api/usuarios', (req, res) => {
-    db.query('SELECT * FROM usuarios', (err, results) => {
+    db.query('SELECT * FROM usuario', (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao buscar usuários.' });
         res.status(200).json(results);
     });
@@ -72,7 +72,7 @@ app.get('/api/usuarios', (req, res) => {
 // API Delete
 app.delete('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
-    db.query('DELETE FROM usuarios WHERE id = ?', [id], (err, results) => {
+    db.query('DELETE FROM usuario WHERE id = ?', [id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao excluir usuário.' });
         res.status(200).json({ message: 'Usuário excluído com sucesso!' });
     });
@@ -83,7 +83,7 @@ app.put('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
     const { nome, email, cpf } = req.body;
 
-    db.query('UPDATE usuarios SET nome = ?, email = ?, cpf = ? WHERE id = ?', [nome, email, cpf, id], (err, results) => {
+    db.query('UPDATE usuario SET nome = ?, email = ?, cpf = ? WHERE id = ?', [nome, email, cpf, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar usuário.' });
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     });
@@ -99,7 +99,7 @@ app.post('/api/cadastrarU', async (req, res) => {
     }
 
     const hashpass = await bcrypt.hash(senha, 10);
-    const q = `INSERT INTO usuarios (nome, email, cpf, senha) VALUES (?, ?, ?, ?)`
+    const q = `INSERT INTO usuario (nome, email, cpf, senha) VALUES (?, ?, ?, ?)`
     
     db.query(q, [nome,email,cpf,hashpass], (err,data) => {
         if (err) return res.json(err)
