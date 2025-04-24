@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: black;
+    color: white;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #911924;
+    height: 10vh;
+}
+
+.logo img {
+    width: 180px;
+    height: 220px;
+    margin-top: 40px;
+}
+
+.crud-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 100px auto;
+    background-color: #000;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+}
+
+.crud-container h2 {
+    color: #911924;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #333;
+}
+
+th {
+    color: #911924;
+    text-transform: uppercase;
+}
+
+button.cadastrar,
+button.editar,
+button.deletar {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 5px;
+    transition: 0.3s;
+}
+
+/* Botão de cadastrar está sendo forçado para o meio, quem for mexer no css se possível arrumar para ficar */
+
+button.cadastrar {
+   margin-left: 405px;
+}
+
+button.editar {
+    background-color: #2980b9;
+}
+
+button.deletar {
+    background-color: #c0392b;
+}
+
+button.cadastrar {
+    background-color: orange;
+}
+
+button.editar:hover {
+    background-color: #3498db;
+    transform: scale(1.05);
+}
+
+button.deletar:hover {
+    background-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+button.cadastrar:hover {
+    background-color: rgb(119, 82, 12);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .crud-container {
+        padding: 20px;
+        margin-top: 60px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    .logo img {
+        width: 150px;
+        height: 180px;
+    }
+}

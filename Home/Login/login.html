@@ -10,25 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Verifica se o usuário já está logado
-        window.onload = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/check-session', {
-                    credentials: 'include'
-                });
-
-                const result = await response.json();
-                const loginStatus = document.getElementById('login-status');
-
-                // Verifica se o elemento existe antes de modificar
-                if (loginStatus) {
-                    loginStatus.textContent = result.loggedIn ? '✅' : '❌';
-                }
-            } catch (error) {
-                console.error('Erro ao verificar a sessão:', error);
-            }
-        };
-
         const login = async () => {
             const email = document.getElementById('email').value;
             const senha = document.getElementById('senha').value;
@@ -53,8 +34,10 @@
             });
 
             const result = await response.json();
+            console.log(result)
 
             if (response.ok) {
+
                 Swal.fire({
                     icon: "success",
                     title: "Sucesso",
@@ -75,6 +58,15 @@
             }
 
         };
+
+            document.addEventListener('DOMContentLoaded', () => {
+            const checkbox = document.getElementById('mostrarSenhaLogin');
+            const senhaInput = document.getElementById('senha');
+
+            checkbox.addEventListener('change', () => {
+                senhaInput.type = checkbox.checked ? 'text' : 'password';
+            });
+        });
     </script>
 
 
@@ -95,6 +87,11 @@
 
         <label for="senha">Senha:</label>
         <input type="password" id="senha" name="senha" required>
+
+        <div style="margin-top: 5px; margin-bottom: 15px;">
+            <input type="checkbox" id="mostrarSenhaLogin" style="width: auto; margin-right: 5px;">
+            <label for="mostrarSenhaLogin">Mostrar senha</label>
+        </div>
 
         <button onclick="login()">Entrar</button>
 

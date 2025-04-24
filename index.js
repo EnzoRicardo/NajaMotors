@@ -1,32 +1,27 @@
 const express = require('express');
-const session = require('express-session');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const { message } = require('statuses');
 const app = express();
 
-app.use(cors({
-    origin: 'http://localhost:5500', // Ajuste conforme necessário
-    credentials: true
-}));
 
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.static('./Home'));
 
-// Configuração do express-session
 app.use(session({
-    secret: 'sua_chave_secreta', // Troque por uma chave forte
+    secret: 'carro',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // true se usar HTTPS
+    cookie: {
+        maxAge: 1000 * 60 * 60
+    }
 }));
-
-const ADMIN_CREDENTIALS = {
-    email: 'admin',
-    senha: 'admin'
-}
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -35,7 +30,6 @@ const db = mysql.createConnection({
     database: 'najamotors'
 });
 
-// **Login - Salva usuário na sessão**
 app.post('/api/login', (req, res) => {
     const { email, senha } = req.body;
 
@@ -43,92 +37,78 @@ app.post('/api/login', (req, res) => {
         return res.status(400).json({ message: 'Os campos são obrigatórios.' });
     }
 
-    if (email === 'admin' && senha === 'admin123') {
-        req.session.usuario = {email: 'admin', isAdmin: true };
-        return res.status(200).json({
-            message: 'Logado como admin',
-            usuario: {email: 'admin', isAdmin: true }
-        })
-    }
+    const q = `SELECT * FROM usuario WHERE email = ?`
+    
+    db.query(q, [email], async (err,data) => {
+        if (err) return res.status(500).json(err)
+        
+        if(data.length === 0) return res.status(401).json({message: 'Usuário não encontrado'})
+        
+        const usuario = data[0];
+        const passmatch = await bcrypt.compare(senha, usuario.senha);
 
-    db.query('SELECT * FROM usuarios WHERE email = ? AND senha = ?', [email, senha], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Erro ao buscar usuário.' });
-        if (results.length === 0) return res.status(401).json({ message: 'Usuário ou senha incorretos.' });
-
-        // Login bem-sucedido: Salvar na sessão
-        req.session.usuario = {
-            ...results[0],
-            isAdmin: false
+        if (!passmatch) {
+            return res.status(401).json({message: 'Senha incorreta.'})
         }
-        res.status(200).json({ message: 'Login bem-sucedido!', usuario: {...results[0], isAdmin: false }});
-    });
+
+        req.session.user = {
+            id: usuario.id,
+            name: usuario.nome,
+            email: usuario.email
+        }
+
+        return res.status(200).json({ message: "Logado com sucesso"});
+    })
 });
 
-// **Checar sessão ativa**
-app.get('/api/check-session', (req, res) => {
-    if (req.session.usuario) {
-        res.json({ loggedIn: true, usuario: req.session.usuario });
-    } else {
-        res.json({ loggedIn: false });
-    }
-});
-
-// **Logout - Destrói a sessão**
-app.post('/api/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) return res.status(500).json({ message: 'Erro ao sair.' });
-        res.status(200).json({ message: 'Logout bem-sucedido.' });
-    });
-});
-
-
-
-// Rota para obter todos os usuários
+// API listar
 app.get('/api/usuarios', (req, res) => {
-    db.query('SELECT * FROM usuarios', (err, results) => {
+    db.query('SELECT * FROM usuario', (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao buscar usuários.' });
         res.status(200).json(results);
     });
 });
 
-// Rota para excluir um usuário
+// API Delete
 app.delete('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
-    db.query('DELETE FROM usuarios WHERE id = ?', [id], (err, results) => {
+    db.query('DELETE FROM usuario WHERE id = ?', [id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao excluir usuário.' });
         res.status(200).json({ message: 'Usuário excluído com sucesso!' });
     });
 });
 
-// Rota para atualizar um usuário
+// API Update
 app.put('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
-    const { nome, email, senha } = req.body;
+    const { nome, email, cpf } = req.body;
 
-    db.query('UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?', [nome, email, senha, id], (err, results) => {
+    db.query('UPDATE usuario SET nome = ?, email = ?, cpf = ? WHERE id = ?', [nome, email, cpf, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar usuário.' });
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     });
 });
 
 
+// API Create Usuário
+app.post('/api/cadastrarU', async (req, res) => {
+    const { nome, email, cpf, senha } = req.body;
 
-app.post('/api/cadastrarU', (req, res) => {
-    const { nome, email, senha } = req.body;
-
-    if (!nome || !email || !senha) {
+    if (!nome || !email || !cpf || !senha) {
         return res.status(400).json({ message: 'Os campos são obrigatórios.' });
     }
 
-    // Inserir usuário no banco de dados
-    db.query('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', [nome, email, senha], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
-        res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
-    });
+    const hashpass = await bcrypt.hash(senha, 10);
+    const q = `INSERT INTO usuario (nome, email, cpf, senha) VALUES (?, ?, ?, ?)`
+    
+    db.query(q, [nome,email,cpf,hashpass], (err,data) => {
+        if (err) return res.json(err)
+        return res.json("Usuário registrado.")
+    })
 });
 
 
-// Rota para obter todos os produtos
+// API listar carro
 app.get('/api/produtos', (req, res) => {
     db.query('SELECT * FROM produtos', (err, results) => {
         if (err) {
@@ -146,7 +126,7 @@ app.get('/api/produtos', (req, res) => {
     });
 });
 
-// Rota para excluir um produto
+// API Delete Carro
 app.delete('/api/produtos/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM produtos WHERE id = ?', [id], (err, results) => {
@@ -155,7 +135,7 @@ app.delete('/api/produtos/:id', (req, res) => {
     });
 });
 
-// Rota para atualizar um usuário
+// API Update Carro
 app.put('/api/produtos/:id', (req, res) => {
     const { id } = req.params;
     const { nome, descricao, preco } = req.body;
@@ -170,6 +150,7 @@ app.put('/api/produtos/:id', (req, res) => {
     );
 });
 
+// API Create Carro
 app.post('/api/cadastrarP', (req, res) => {
     const { nome, descricao, preco, imagem } = req.body;
 
@@ -190,6 +171,27 @@ app.post('/api/cadastrarP', (req, res) => {
     });
 });
 
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(err => {
+        if(err) {
+            return res.status(500).json({ message: 'Erro ao fazer logout. '});
+        }
+        res.json({ message: 'Logout realizado. '});
+    })
+})
+
+function authMiddleware(req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401).json({ message: 'Não autorizado' });
+    }
+}
+
+
+app.get('/api/usuario', authMiddleware, (req, res) => {
+    res.json({usuario: req.session.user})
+})
 
 const port = 3000;
 app.listen(port, () => {

@@ -6,6 +6,11 @@
     font-family: 'Poppins';
 }
 
+input[type="checkbox"]#mostrarSenha {
+    width: 1.2em;
+    height: 1.2em;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -16,7 +21,9 @@ body {
 
 .logo {
     position: relative;
-    top: 75px; 
+    top: 75px;
+    display: flex;
+    justify-content: center;
 }
 
 .logo img {
@@ -41,14 +48,12 @@ nav {
     text-align: center;
 }
 
-
 .login-container h2 {
     margin-bottom: 20px;
     color: #911924;
     font-size: 32px;
     text-transform: uppercase;
 }
-
 
 .login-container label {
     display: block;
@@ -57,7 +62,6 @@ nav {
     margin: 10px 0 5px;
     color: white;
 }
-
 
 .login-container input {
     width: 100%;
@@ -72,7 +76,6 @@ nav {
     border-color: #911924;
     outline: none;
 }
-
 
 .login-container button {
     width: 100%;
@@ -93,7 +96,6 @@ nav {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-
 .login-container p {
     margin-top: 15px;
     font-size: 14px;
@@ -107,4 +109,67 @@ nav {
 
 .login-container a:hover {
     text-decoration: underline;
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+    .logo img {
+        width: 150px;
+        height: 180px;
+    }
+
+    .login-container {
+        margin-top: 80px;
+        padding: 15px;
+        max-width: 90%;
+    }
+
+    .login-container h2 {
+        font-size: 28px;
+    }
+
+    .login-container input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .login-container button {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .login-container p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo img {
+        width: 130px;
+        height: 160px;
+    }
+
+    .login-container {
+        margin-top: 60px;
+        padding: 10px;
+        max-width: 95%;
+    }
+
+    .login-container h2 {
+        font-size: 24px;
+    }
+
+    .login-container input {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .login-container button {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .login-container p {
+        font-size: 10px;
+    }
 }
