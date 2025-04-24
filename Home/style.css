@@ -232,65 +232,45 @@ li:hover a {
     background: #6d131a;
 }
 
-/* RESPONSIVO COM MENU TOGGLE */
+/* Esconde menu padrão e mostra hambúrguer em telas pequenas */
 @media screen and (max-width: 768px) {
-    nav {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        padding: 1rem;
-        position: relative;
-    }
-
     .nav-list {
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100vh;
-        width: 250px;
-        background-color: #111;
+        position: absolute;
+        top: 10vh;
+        left: 0;
+        width: 100%;
+        background-color: #911924;
         flex-direction: column;
-        align-items: flex-start;
-        justify-content: start;
-        padding: 2rem 1rem;
-        gap: 1rem;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        z-index: 1000;
+        align-items: center;
+        display: none;
+        z-index: 999; /* suficiente para aparecer, mas não exagerado */
     }
 
     .nav-list.active {
-        transform: translateX(0);
+        display: flex;
     }
 
     .nav-list li {
-        width: 100%;
-    }
-
-    .nav-list li a {
-        display: block;
-        width: 100%;
-        color: white;
-        padding: 0.75rem 1rem;
-        text-decoration: none;
-    }
-
-    .login-status,
-    #login-btn,
-    #logout-btn {
-        margin-top: 1rem;
+        margin: 20px 0;
     }
 
     .menu-toggle {
         display: block;
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background: none;
-        border: none;
-        font-size: 2rem;
-        color: #fff;
-        cursor: pointer;
-        z-index: 1100;
+        z-index: 1000;
+    }
+
+    .login-btn {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: block !important;
+    }
+}
+
+
+@media screen and (min-width: 769px) {
+    .mobile-only {
+        display: none;
     }
 }

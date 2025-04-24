@@ -17,12 +17,17 @@
     <header>
         <nav>
             <a class="logo" href="#"> <img src="IMG/Logo NM.png" alt="NM"> </a>
-            <ul class="nav-list">
+            <!-- Dentro do <nav> -->
+            <div class="menu-toggle" id="mobile-menu">
+              ☰
+            </div>
+            <ul class="nav-list" id="nav-list">
                 <li><a href="#about">Sobre</a></li>
                 <li><a href="#models">Modelos</a></li>
                 <li><a href="crud.html">CRUD</a></li>
                 <li><a href="#">Fale Conosco</a></li>
                 <li><a id="nomeUsuario"></a></li>
+                <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
             </ul>
             
             <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
@@ -69,48 +74,78 @@
 
     <script src="script.js"></script>
     <script>
-        window.onload = async () => {
-          try {
-            const res = await fetch('http://localhost:3000/api/usuario', {
-              credentials: 'include'
-            });
-      
-            if (res.ok) {
-              const data = await res.json();
-              const nome = data.usuario.name;
-              document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
-              
-              // Exibe o botão de logout, esconde o de login
-              document.getElementById('login-btn').style.display = 'none';
-              document.getElementById('logout-btn').style.display = 'inline-block';
-            } else {
-              // Se não estiver logado, esconde logout
-              document.getElementById('logout-btn').style.display = 'none';
-              document.getElementById('login-btn').style.display = 'inline-block';
-            }
-          } catch (error) {
-            console.error('Erro ao buscar usuário:', error);
-          }
-        };
-      
-        // Função de logout
-        async function logout() {
-          const res = await fetch('http://localhost:3000/api/logout', {
-            method: 'POST',
-            credentials: 'include'
+      const menuToggle = document.getElementById('mobile-menu');
+      const navList = document.getElementById('nav-list');
+  
+      menuToggle.addEventListener('click', () => {
+          navList.classList.toggle('active');
+      });
+
+      document.querySelectorAll('#nav-list a').forEach(link => {
+          link.addEventListener('click', () => {
+              navList.classList.remove('active');
           });
-      
-          if (res.ok) {
-            window.location.href = './Login/login.html';
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: 'Falha ao fazer logout.'
-            });
+      });
+  
+      // Unificação do carregamento e controle de login/logout
+      window.onload = async () => {
+          try {
+              const res = await fetch('http://localhost:3000/api/usuario', {
+                  credentials: 'include'
+              });
+  
+              const loginBtn = document.getElementById('login-btn');
+              const logoutBtn = document.getElementById('logout-btn');
+              const loginItem = document.getElementById('login-item');
+  
+              if (res.ok) {
+                  const data = await res.json();
+                  const nome = data.usuario.name;
+                  document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
+  
+                  // Mostrar apenas Logout
+                  if (loginBtn) loginBtn.style.display = 'none';
+                  if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                  if (loginItem) {
+                      loginItem.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
+                  }
+              } else {
+                  // Mostrar apenas Login
+                  if (loginBtn) loginBtn.style.display = 'inline-block';
+                  if (logoutBtn) logoutBtn.style.display = 'none';
+                  if (loginItem) {
+                      loginItem.innerHTML = `<a href="./Login/login.html">Login</a>`;
+                  }
+              }
+          } catch (error) {
+              console.error('Erro ao buscar usuário:', error);
+              // Fallback: mostra apenas login
+              if (document.getElementById('login-btn')) document.getElementById('login-btn').style.display = 'inline-block';
+              if (document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
+              if (document.getElementById('login-item')) {
+                  document.getElementById('login-item').innerHTML = `<a href="./Login/login.html">Login</a>`;
+              }
           }
-        }
-      </script>
+      };
+  
+      async function logout() {
+          const res = await fetch('http://localhost:3000/api/logout', {
+              method: 'POST',
+              credentials: 'include'
+          });
+  
+          if (res.ok) {
+              window.location.href = './Login/login.html';
+          } else {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Erro',
+                  text: 'Falha ao fazer logout.'
+              });
+          }
+      }
+  </script>
+  
       
 </body>
 </html>

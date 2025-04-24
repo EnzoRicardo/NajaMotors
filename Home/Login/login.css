@@ -1,18 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
     margin: 0;
     padding: 0;
-    font-family: 'Poppins';
-}
-
-input[type="checkbox"]#mostrarSenha {
-    width: 1.2em;
-    height: 1.2em;
-}
-
-html {
-    scroll-behavior: smooth;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -20,20 +12,20 @@ body {
 }
 
 .logo {
-    position: relative;
-    top: 75px;
     display: flex;
     justify-content: center;
+    padding: 20px 0;
 }
 
 .logo img {
     width: 180px;
-    height: 220px;
+    height: auto;
+    max-height: 220px;
 }
 
 nav {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     background: #911924;
     height: 10vh;
@@ -41,18 +33,19 @@ nav {
 
 .login-container {
     width: 100%;
-    max-width: 380px;
-    margin: 140px auto;
-    padding: 20px;
-    background: #000000;
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 25px;
+    background: #000;
     text-align: center;
+    border-radius: 8px;
 }
 
 .login-container h2 {
-    margin-bottom: 20px;
     color: #911924;
     font-size: 32px;
     text-transform: uppercase;
+    margin-bottom: 20px;
 }
 
 .login-container label {
@@ -65,11 +58,11 @@ nav {
 
 .login-container input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 50px;
     font-size: 16px;
-    transition: 0.3s;
+    margin-bottom: 10px;
 }
 
 .login-container input:focus {
@@ -80,26 +73,26 @@ nav {
 .login-container button {
     width: 100%;
     padding: 12px;
-    margin-top: 19px;
     background: #911924;
     border: none;
     border-radius: 50px;
     color: white;
     font-size: 18px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease;
+    margin-top: 15px;
 }
 
 .login-container button:hover {
     background-color: #c0392b;
     transform: scale(1.05);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .login-container p {
     margin-top: 15px;
     font-size: 14px;
-    color: #ffffff;
+    color: #fff;
 }
 
 .login-container a {
@@ -111,65 +104,56 @@ nav {
     text-decoration: underline;
 }
 
-/* Media Queries para responsividade */
+/* 📱 Responsivo: Tablets e menores */
 @media (max-width: 768px) {
-    .logo img {
-        width: 150px;
-        height: 180px;
+    .login-container {
+        margin: 60px auto;
+        padding: 20px;
     }
 
+    .login-container h2 {
+        font-size: 26px;
+    }
+
+    .login-container input,
+    .login-container button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .login-container p {
+        font-size: 13px;
+    }
+
+    .logo img {
+        width: 150px;
+    }
+}
+
+/* 📱 Responsivo: Smartphones pequenos */
+@media (max-width: 480px) {
     .login-container {
-        margin-top: 80px;
+        margin: 40px auto;
         padding: 15px;
         max-width: 90%;
     }
 
     .login-container h2 {
-        font-size: 28px;
+        font-size: 22px;
     }
 
-    .login-container input {
-        font-size: 14px;
+    .login-container input,
+    .login-container button {
+        font-size: 13px;
         padding: 8px;
     }
 
-    .login-container button {
-        font-size: 16px;
-        padding: 10px;
-    }
-
     .login-container p {
-        font-size: 12px;
+        font-size: 11px;
     }
-}
 
-@media (max-width: 480px) {
     .logo img {
         width: 130px;
-        height: 160px;
-    }
-
-    .login-container {
-        margin-top: 60px;
-        padding: 10px;
-        max-width: 95%;
-    }
-
-    .login-container h2 {
-        font-size: 24px;
-    }
-
-    .login-container input {
-        font-size: 12px;
-        padding: 6px;
-    }
-
-    .login-container button {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    .login-container p {
-        font-size: 10px;
+        max-height: 160px;
     }
 }

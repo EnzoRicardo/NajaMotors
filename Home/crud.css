@@ -3,6 +3,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
 
@@ -21,13 +22,14 @@ nav {
 
 .logo img {
     width: 180px;
-    height: 220px;
+    height: auto;
+    max-height: 220px;
     margin-top: 40px;
 }
 
 .crud-container {
     width: 90%;
-    max-width: 900px;
+    max-width: 1000px;
     margin: 100px auto;
     background-color: #000;
     padding: 30px;
@@ -43,8 +45,15 @@ nav {
     text-transform: uppercase;
 }
 
+/* Wrapper da tabela para scroll horizontal em telas pequenas */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
 table {
     width: 100%;
+    min-width: 600px; /* Ajuda o scroll horizontal */
     border-collapse: collapse;
     text-align: left;
 }
@@ -57,6 +66,11 @@ th, td {
 th {
     color: #911924;
     text-transform: uppercase;
+    font-size: 14px;
+}
+
+td {
+    font-size: 14px;
 }
 
 button.cadastrar,
@@ -72,10 +86,10 @@ button.deletar {
     transition: 0.3s;
 }
 
-/* Botão de cadastrar está sendo forçado para o meio, quem for mexer no css se possível arrumar para ficar */
-
 button.cadastrar {
-   margin-left: 405px;
+    background-color: orange;
+    display: block;
+    margin: 0 auto 20px;
 }
 
 button.editar {
@@ -84,10 +98,6 @@ button.editar {
 
 button.deletar {
     background-color: #c0392b;
-}
-
-button.cadastrar {
-    background-color: orange;
 }
 
 button.editar:hover {
@@ -105,18 +115,51 @@ button.cadastrar:hover {
     transform: scale(1.05);
 }
 
+/* RESPONSIVIDADE */
 @media (max-width: 768px) {
     .crud-container {
         padding: 20px;
         margin-top: 60px;
     }
 
-    table {
+    .logo img {
+        width: 150px;
+        max-height: 180px;
+    }
+
+    th, td {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    button.cadastrar {
         font-size: 14px;
+        padding: 10px 16px;
+    }
+
+    button.editar,
+    button.deletar {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .crud-container h2 {
+        font-size: 24px;
     }
 
     .logo img {
-        width: 150px;
-        height: 180px;
+        width: 130px;
+        max-height: 160px;
+    }
+
+    th, td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    button {
+        font-size: 12px;
     }
 }
