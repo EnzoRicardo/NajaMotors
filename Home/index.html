@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -13,9 +13,16 @@
       nav {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: center;
         padding: 1rem;
         position: relative;
+      }
+
+      .logo {
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .nav-list {
@@ -39,22 +46,18 @@
         transform: translateX(0);
       }
 
-      .nav-list li {
+      .nav-list li,
+      .nav-list .login-btn {
         width: 100%;
       }
 
-      .nav-list li a {
+      .nav-list li a,
+      .nav-list .login-btn {
         display: block;
         width: 100%;
         color: white;
         padding: 0.75rem 1rem;
         text-decoration: none;
-      }
-
-      .login-status,
-      #login-btn,
-      #logout-btn {
-        margin-top: 1rem;
       }
 
       .menu-toggle {
@@ -69,156 +72,45 @@
         cursor: pointer;
         z-index: 1100;
       }
-    }
 
-    /* ADIÇÃO: menu toggle + overlay */
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      cursor: pointer;
-      font-size: 2rem;
-      color: white;
-      background: none;
-      border: none;
-      z-index: 1101;
-    }
+      #login-btn {
+        display: none !important;
+      }
 
-    .menu-toggle span {
-      height: 3px;
-      width: 25px;
-      background: white;
-      margin: 4px 0;
-      display: block;
-    }
-
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-    }
-
-    .overlay.active {
-      display: block;
-    }
-
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: flex;
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
+      .nav-list .login-btn {
+        display: block !important;
       }
     }
   </style>
-
-  <script>
-    window.onload = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/check-session', {
-          credentials: 'include'
-        });
-
-        const result = await response.json();
-        const loginStatus = document.getElementById('login-status');
-        const loginBtn = document.getElementById('login-btn');
-        const adminLink = document.getElementById('admin-link');
-
-        if (result.loggedIn) {
-          loginStatus.textContent = '✅';
-          loginBtn.style.display = 'none';
-
-          if (result.usuario.isAdmin) {
-            adminLink.style.display = 'block';
-          }
-
-          const logoutBtn = document.createElement('button');
-          logoutBtn.id = 'logout-btn';
-          logoutBtn.textContent = 'Logout';
-          logoutBtn.className = 'login-btn';
-          logoutBtn.addEventListener('click', logout);
-
-          document.querySelector('nav').appendChild(logoutBtn);
-        } else {
-          loginStatus.textContent = '❌';
-          loginBtn.style.display = 'inline-block';
-        }
-      } catch (error) {
-        console.error('Erro ao verificar a sessão:', error);
-      }
-
-      document.querySelectorAll('.nav-list a').forEach(link => {
-        link.addEventListener('click', () => {
-          document.querySelector('.nav-list').classList.remove('active');
-        });
-      });
-    };
-
-    const logout = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/logout', {
-          method: 'POST',
-          credentials: 'include'
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Sucesso!',
-            text: result.message,
-            confirmButtonColor: '#3085d6'
-          }).then(() => {
-            window.location.reload();
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Erro ao sair.',
-            confirmButtonColor: '#d33'
-          });
-        }
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: 'Erro ao realizar logout. Verifique o console para mais detalhes.',
-          confirmButtonColor: '#d33'
-        });
-        console.error('Erro ao realizar logout:', error);
-      }
-    };
-  </script>
 </head>
 <body>
   <header>
     <nav>
       <a class="logo" href="#"><img src="IMG/Logo NM.png" alt="NM"/></a>
-      <span id="login-status" class="login-status">❌</span>
-      <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
-      <button class="menu-toggle" onclick="toggleMenu()">
+
+      <!-- Botão do menu hambúrguer -->
+      <button id="menu-toggle" class="menu-toggle" onclick="toggleMenu()">
         <span></span>
         <span></span>
         <span></span>
       </button>
-      <ul class="nav-list">
+
+      <!-- Menu lateral -->
+      <ul class="nav-list" id="navList">
         <li><a href="#about">Sobre</a></li>
         <li><a href="#models">Modelos</a></li>
         <li><a href="crud.html">CRUD</a></li>
         <li><a href="#">Fale Conosco</a></li>
+        <li><a href="./Login/login.html" class="login-btn" id="login-btn">Login</a></li>
+        <li><button id="logout-btn" style="display:none" onclick="logout()">Logout</button></li>
       </ul>
     </nav>
   </header>
 
-  <!-- ADIÇÃO: overlay -->
-  <div class="overlay" id="menu-overlay" onclick="closeMenu()"></div>
-
   <div class="video-container">
     <video autoplay loop muted>
-      <source src="Videos/3752531-hd_1920_1080_24fps.mp4" type="video/mp4">
+      <source src="Videos/3752531-hd_1920_1080_24fps.mp4" type="video/mp4" />
+      Seu navegador não suporta vídeos.
     </video>
   </div>
 
@@ -226,10 +118,9 @@
 
   <section id="about" class="about">
     <div class="container">
-      <h2 id="about-title"></h2>
-      <p>A Naja Motors nasceu com um propósito claro: redefinir o conceito de potência, design e exclusividade no mundo automotivo. Inspirada na ousadia dos muscle cars clássicos e na inovação dos superesportivos modernos, nossa marca combina engenharia de ponta com um espírito indomável.</p>
-      <p>Cada modelo produzido carrega a essência da Naja Motors: desempenho brutal, design marcante e tecnologia avançada. Não construímos apenas carros, criamos máquinas que despertam emoção a cada aceleração.</p>
-      <p>Seja nas ruas ou nas pistas, a Naja Motors é para aqueles que não aceitam o comum. Para quem vive com intensidade e faz da estrada o seu território.</p>
+      <h2>Sobre Nós</h2>
+      <p>A Naja Motors nasceu com um propósito claro: redefinir o conceito de potência, design e exclusividade no mundo automotivo.</p>
+      <p>Cada modelo carrega a essência da Naja Motors: desempenho brutal, design marcante e tecnologia avançada.</p>
     </div>
   </section>
 
@@ -238,7 +129,7 @@
   <section id="models" class="NajaVenomGT">
     <div class="text-box">
       <h2>Naja Venom GT</h2>
-      <p>Inspirado no Mustang Shelby 1967, o <strong>Naja Venom GT</strong> combina o design clássico dos muscle cars com a tecnologia dos superesportivos modernos. Seu motor <strong>V8 supercharged de 6.2L</strong> entrega <strong>850 cv</strong>, levando de <strong>0 a 100 km/h em 3,2s</strong> e atingindo mais de <strong>300 km/h</strong>.</p>
+      <p>Inspirado no Mustang Shelby 1967, o <strong>Naja Venom GT</strong> entrega <strong>850 cv</strong> e vai de <strong>0 a 100 km/h em 3,2s</strong>.</p>
       <a href="#" class="btn">Veja o modelo</a>
     </div>
     <div class="image-box">
@@ -250,23 +141,46 @@
 
   <button id="backToTop">⬆</button>
 
-  <!-- ADIÇÃO: toggle menu script -->
   <script>
-    const navList = document.querySelector('.nav-list');
-    const overlay = document.getElementById('menu-overlay');
-
     function toggleMenu() {
-      navList.classList.toggle('active');
-      overlay.classList.toggle('active');
+      const navList = document.querySelector('.nav-list');
+      const toggleBtn = document.getElementById("menu-toggle");
+
+      navList.classList.toggle("active");
+      toggleBtn.classList.toggle("active");
     }
 
-    function closeMenu() {
-      navList.classList.remove('active');
-      overlay.classList.remove('active');
+    async function logout() {
+      try {
+        const response = await fetch('http://localhost:3000/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          window.location.href = './Login/login.html';
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Falha ao fazer logout.'
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
 
-    document.querySelectorAll('.nav-list a').forEach(link => {
-      link.addEventListener('click', closeMenu);
+    document.addEventListener('DOMContentLoaded', () => {
+      const navList = document.querySelector('.nav-list');
+      const loginBtn = document.getElementById('login-btn');
+
+      // Move login para dentro da nav-list
+      if (window.innerWidth <= 768 && loginBtn) {
+        const clone = loginBtn.cloneNode(true);
+        clone.style.display = 'block';
+        navList.appendChild(clone);
+      }
     });
   </script>
 </body>
