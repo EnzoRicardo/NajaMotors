@@ -1,223 +1,116 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Naja Motors</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="/image/Logo NM.png" type="image/x-icon"/>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naja Motors</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
 
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #111;
-      color: white;
-      padding: 1rem;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 1000;
-    }
 
-    .logo img {
-      height: 40px;
-    }
 
-    .nav-list {
-      position: fixed;
-      top: 0;
-      right: -250px;
-      width: 250px;
-      height: 100vh;
-      background-color: #111;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: start;
-      padding: 2rem 1rem;
-      gap: 1rem;
-      transition: transform 0.3s ease-in-out;
-      z-index: 999;
-    }
-
-    .nav-list.active {
-      transform: translateX(-250px);
-    }
-
-    .nav-list li {
-      width: 100%;
-    }
-
-    .nav-list a,
-    .nav-list .login-btn {
-      display: block;
-      color: white;
-      padding: 0.75rem 1rem;
-      text-decoration: none;
-      font-size: 1rem;
-      width: 100%;
-    }
-
-    .nav-list .login-btn {
-      display: block !important;
-    }
-
-    .menu-toggle {
-      display: block;
-      background: none;
-      border: none;
-      font-size: 2rem;
-      color: white;
-      cursor: pointer;
-      z-index: 1001;
-    }
-
-    .menu-toggle span {
-      display: block;
-      width: 30px;
-      height: 3px;
-      background-color: white;
-      margin: 5px 0;
-    }
-
-    @media (max-width: 768px) {
-      nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      .nav-list {
-        right: 0;
-      }
-
-      .nav-list.active {
-        right: 0;
-      }
-
-      .login-btn {
-        display: block;
-      }
-
-      #login-btn {
-        display: none !important;
-      }
-    }
-  </style>
 </head>
 <body>
-  <header>
-    <nav>
-      <a class="logo" href="#"><img src="IMG/Logo NM.png" alt="NM"/></a>
+    <header>
+        <nav>
+            <a class="logo" href="#"> <img src="IMG/Logo NM.png" alt="NM"> </a>
+            <ul class="nav-list">
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="#models">Modelos</a></li>
+                <li><a href="crud.html">CRUD</a></li>
+                <li><a href="#">Fale Conosco</a></li>
+                <li><a id="nomeUsuario"></a></li>
+            </ul>
+            
+            <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
+            <a href="./Login/login.html" class="login-btn" id="logout-btn" onclick="logout()">Logout</a>
+        </nav>
+    </header>
 
-      <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <ul class="nav-list" id="navList">
-        <li><a href="#about">Sobre</a></li>
-        <li><a href="#models">Modelos</a></li>
-        <li><a href="crud.html">CRUD</a></li>
-        <li><a href="#">Fale Conosco</a></li>
-        <li><a href="./Login/login.html" class="login-btn" id="login-btn">Login</a></li>
-        <li><button id="logout-btn" onclick="logout()">Logout</button></li>
-      </ul>
-    </nav>
-  </header>
-
-  <div class="video-container">
-    <video autoplay loop muted>
-      <source src="Videos/3752531-hd_1920_1080_24fps.mp4" type="video/mp4" />
-      Seu navegador não suporta vídeos.
-    </video>
-  </div>
-
-  <div class="divider"></div>
-
-  <section id="about" class="about">
-    <div class="container">
-      <h2>Sobre Nós</h2>
-      <p>A Naja Motors nasceu com um propósito claro: redefinir o conceito de potência, design e exclusividade no mundo automotivo.</p>
-      <p>Cada modelo carrega a essência da Naja Motors: desempenho brutal, design marcante e tecnologia avançada.</p>
+    <div class="video-container">
+        <video autoplay loop muted>
+            <source src="Videos/3752531-hd_1920_1080_24fps.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos.
+        </video>
     </div>
-  </section>
 
-  <div class="divider"></div>
+    <div class="divider"></div>
 
-  <section id="models" class="NajaVenomGT">
-    <div class="text-box">
-      <h2>Naja Venom GT</h2>
-      <p>Inspirado no Mustang Shelby 1967, o <strong>Naja Venom GT</strong> entrega <strong>850 cv</strong> e vai de <strong>0 a 100 km/h em 3,2s</strong>.</p>
-      <a href="#" class="btn">Veja o modelo</a>
-    </div>
-    <div class="image-box">
-      <img src="IMG/Naja Venom GT 3.png" />
-      <img src="IMG/Naja Venom GT 5.png" />
-      <img src="IMG/Naja Venom GT 6.png" />
-    </div>
-  </section>
+    <section id="about" class="about">
+        <div class="container">
+            <h2 id="about-title"></h2>
+            <p>A Naja Motors nasceu com um propósito claro: redefinir o conceito de potência, design e exclusividade no mundo automotivo. Inspirada na ousadia dos muscle cars clássicos e na inovação dos superesportivos modernos, nossa marca combina engenharia de ponta com um espírito indomável.</p>
+            <p>Cada modelo produzido carrega a essência da Naja Motors: desempenho brutal, design marcante e tecnologia avançada. Não construímos apenas carros, criamos máquinas que despertam emoção a cada aceleração.</p>
+            <p>Seja nas ruas ou nas pistas, a Naja Motors é para aqueles que não aceitam o comum. Para quem vive com intensidade e faz da estrada o seu território.</p>
+        </div>
+    </section>
 
-  <button id="backToTop">⬆</button>
+    <div class="divider"></div>
+    
+    <section id="models" class="NajaVenomGT">
+        <div class="text-box">
+            <h2>Naja Venom GT</h2>
+        <p>Inspirado no Mustang Shelby 1967, o <strong>Naja Venom GT</strong> combina o design clássico dos muscle cars com a tecnologia dos superesportivos modernos. Seu motor <strong>V8 supercharged de 6.2L</strong> entrega <strong>850 cv</strong>, levando de <strong>0 a 100 km/h em 3,2s</strong> e atingindo mais de <strong>300 km/h</strong>.</p>
+        <a href="#" class="btn">Veja o modelo</a>
+        </div>
+        <div class="image-box">
+            <img src="IMG/Naja Venom GT 3.png" >
+            <img src="IMG/Naja Venom GT 5.png" >
+            <img src="IMG/Naja Venom GT 6.png" >
+        </div>
+    </section>
 
-  <script>
-    let menuOpened = false;
 
-    function toggleMenu() {
-      const navList = document.querySelector('.nav-list');
-      navList.classList.toggle("active");
-      menuOpened = !menuOpened;
 
-      if (menuOpened) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-    }
+    <button id="backToTop">⬆</button>
 
-    async function logout() {
-      try {
-        const response = await fetch('http://localhost:3000/api/logout', {
-          method: 'POST',
-          credentials: 'include'
-        });
-
-        if (response.ok) {
-          window.location.href = './Login/login.html';
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Falha ao fazer logout.'
+    <script src="script.js"></script>
+    <script>
+        window.onload = async () => {
+          try {
+            const res = await fetch('http://localhost:3000/api/usuario', {
+              credentials: 'include'
+            });
+      
+            if (res.ok) {
+              const data = await res.json();
+              const nome = data.usuario.name;
+              document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
+              
+              // Exibe o botão de logout, esconde o de login
+              document.getElementById('login-btn').style.display = 'none';
+              document.getElementById('logout-btn').style.display = 'inline-block';
+            } else {
+              // Se não estiver logado, esconde logout
+              document.getElementById('logout-btn').style.display = 'none';
+              document.getElementById('login-btn').style.display = 'inline-block';
+            }
+          } catch (error) {
+            console.error('Erro ao buscar usuário:', error);
+          }
+        };
+      
+        // Função de logout
+        async function logout() {
+          const res = await fetch('http://localhost:3000/api/logout', {
+            method: 'POST',
+            credentials: 'include'
           });
+      
+          if (res.ok) {
+            window.location.href = './Login/login.html';
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: 'Falha ao fazer logout.'
+            });
+          }
         }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const navList = document.querySelector('.nav-list');
-      const loginBtn = document.getElementById('login-btn');
-
-      if (loginBtn) {
-        loginBtn.style.display = 'block';
-      }
-    });
-  </script>
+      </script>
+      
 </body>
 </html>
