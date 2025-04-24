@@ -8,6 +8,70 @@
     <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @media (max-width: 768px) {
+            nav {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                padding: 1rem;
+                position: relative;
+            }
+
+            .nav-list {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: 250px;
+                background-color: #111;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: start;
+                padding: 2rem 1rem;
+                gap: 1rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            .nav-list.active {
+                transform: translateX(0);
+            }
+
+            .nav-list li {
+                width: 100%;
+            }
+
+            .nav-list li a {
+                display: block;
+                width: 100%;
+                color: white;
+                padding: 0.75rem 1rem;
+                text-decoration: none;
+            }
+
+            .login-status,
+            #login-btn,
+            #logout-btn {
+                margin-top: 1rem;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                font-size: 2rem;
+                color: #fff;
+                cursor: pointer;
+                z-index: 1100;
+            }
+        }
+    </style>
+
     <script>
         window.onload = async () => {
             try {
@@ -21,14 +85,13 @@
                 const adminLink = document.getElementById('admin-link');
     
                 if (result.loggedIn) {
-                    loginStatus.textContent = '✅'; // Usuário logado
-                    loginBtn.style.display = 'none'; // Esconde botão login
+                    loginStatus.textContent = '✅';
+                    loginBtn.style.display = 'none';
     
                     if (result.usuario.isAdmin) {
                         adminLink.style.display = 'block';
                     }
 
-                    // Cria o botão Logout
                     const logoutBtn = document.createElement('button');
                     logoutBtn.id = 'logout-btn';
                     logoutBtn.textContent = 'Logout';
@@ -37,12 +100,18 @@
                     
                     document.querySelector('nav').appendChild(logoutBtn);
                 } else {
-                    loginStatus.textContent = '❌'; // Usuário não logado
+                    loginStatus.textContent = '❌';
                     loginBtn.style.display = 'inline-block';
                 }
             } catch (error) {
                 console.error('Erro ao verificar a sessão:', error);
             }
+
+            document.querySelectorAll('.nav-list a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.querySelector('.nav-list').classList.remove('active');
+                });
+            });
         };
     
         const logout = async () => {
@@ -82,8 +151,6 @@
         }
     };
     </script>
-
-
 </head>
 <body>
     <header>
@@ -98,15 +165,14 @@
             </ul>
 
             <span id="login-status" class="login-status">❌</span>
-            
             <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
         </nav>
+        <button class="menu-toggle" onclick="document.querySelector('.nav-list').classList.toggle('active')">&#9776;</button>
     </header>
 
     <div class="video-container">
         <video autoplay loop muted>
             <source src="Videos/3752531-hd_1920_1080_24fps.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos.
         </video>
     </div>
 
@@ -135,8 +201,6 @@
             <img src="IMG/Naja Venom GT 6.png" >
         </div>
     </section>
-
-
 
     <button id="backToTop">⬆</button>
 
