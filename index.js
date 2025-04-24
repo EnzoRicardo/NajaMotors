@@ -107,70 +107,6 @@ app.post('/api/cadastrarU', async (req, res) => {
     })
 });
 
-
-// API listar carro
-app.get('/api/produtos', (req, res) => {
-    db.query('SELECT * FROM produtos', (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Erro ao buscar produtos.' });
-        }
-
-        // Convertendo o BLOB de volta para Base64 para envio
-        const produtosComImagemBase64 = results.map(produto => ({
-            ...produto,
-            imagem: produto.imagem ? produto.imagem.toString('base64') : null  // Converte o BLOB de volta para Base64
-        }));
-
-        res.json(produtosComImagemBase64);
-    });
-});
-
-// API Delete Carro
-app.delete('/api/produtos/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('DELETE FROM produtos WHERE id = ?', [id], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Erro ao excluir produto.' });
-        res.status(200).json({ message: 'Produto excluído com sucesso!' });
-    });
-});
-
-// API Update Carro
-app.put('/api/produtos/:id', (req, res) => {
-    const { id } = req.params;
-    const { nome, descricao, preco } = req.body;
-
-    db.query(
-        'UPDATE produtos SET nome = ?, descricao = ?, preco = ? WHERE id = ?',
-        [nome, descricao, preco, id],
-        (err, results) => {
-            if (err) return res.status(500).json({ message: 'Erro ao atualizar produto.' });
-            res.status(200).json({ message: 'Produto atualizado com sucesso!' });
-        }
-    );
-});
-
-// API Create Carro
-app.post('/api/cadastrarP', (req, res) => {
-    const { nome, descricao, preco, imagem } = req.body;
-
-    if (!nome || !descricao || !preco || !imagem) {
-        return res.status(400).json({ message: 'Os campos são obrigatórios.' });
-    }
-
-    const imagemBuffer = Buffer.from(imagem, 'base64')
-
-    // Inserir produto no banco de dados
-    const query = `INSERT INTO produtos (nome, descricao, preco, imagem) VALUES (?, ?, ?, ?)`;
-    db.query(query, [nome, descricao, preco, imagemBuffer], (err, result) => {
-        if (err) {
-            console.log(err)
-            return res.status(500).json({message: 'Erro ao cadastrar produto.'});
-        }
-        res.status(201).json({message: 'Produto cadastrado com sucesso!'});
-    });
-});
-
 app.post('/api/logout', (req, res) => {
     req.session.destroy(err => {
         if(err) {
@@ -192,6 +128,84 @@ function authMiddleware(req, res, next) {
 app.get('/api/usuario', authMiddleware, (req, res) => {
     res.json({usuario: req.session.user})
 })
+
+
+// API listar Carro
+app.get('/api/carros', (req, res) => {
+    const sql = `
+        SELECT 
+            Carro.id AS id,
+            Carro.ano,
+            CONCAT('R$ ', FORMAT(Carro.preco, 2, 'pt_BR')) AS preco,
+            Modelo.nome AS modelo,
+            Marca.nome AS marca
+        FROM Carro
+        JOIN Modelo ON Carro.modelo_id = Modelo.id
+        JOIN Marca ON Modelo.marca_id = Marca.id
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao buscar carros.' });
+        res.status(200).json(results);
+    });
+});
+
+
+app.post('/api/cadastrarC', (req, res) => {
+    const { ano, preco, modelo } = req.body;
+
+    // Buscar modelo_id
+    const buscaModelo = 'SELECT id FROM Modelo WHERE nome = ? LIMIT 1';
+
+    db.query(buscaModelo, [modelo], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(400).json({ message: 'Modelo não encontrado.' });
+        }
+
+        const modelo_id = results[0].id;
+
+        const insert = 'INSERT INTO Carro (ano, preco, modelo_id) VALUES (?, ?, ?)';
+        db.query(insert, [ano, preco, modelo_id], (err) => {
+            if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
+            res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
+        });
+    });
+});
+
+
+app.put('/api/carro/:id', (req, res) => {
+    const { ano, preco, modelo } = req.body;
+    const id = req.params.id;
+
+    const buscaModelo = 'SELECT id FROM Modelo WHERE nome = ? LIMIT 1';
+    
+    db.query(buscaModelo, [modelo], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(400).json({ message: 'Modelo não encontrado.' });
+        }
+
+        const modelo_id = results[0].id;
+
+        const updateQuery = 'UPDATE Carro SET ano = ?, preco = ?, modelo_id = ? WHERE id = ?';
+        db.query(updateQuery, [ano, preco, modelo_id, id], (err) => {
+            if (err) return res.status(500).json({ message: 'Erro ao atualizar carro.' });
+            res.status(200).json({ message: 'Carro atualizado com sucesso!' });
+        });
+    });
+});
+
+
+// API Delete Carro
+app.delete('/api/carro/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM Carro WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao excluir carro.' });
+        res.status(200).json({ message: 'Carro excluído com sucesso!' });
+    });
+});
+
+
+
 
 const port = 3000;
 app.listen(port, () => {

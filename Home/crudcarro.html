@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD de Carros - Naja Motors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="crud.css">
+    <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="../index.html">
+                <img src="../IMG/Logo NM.png" alt="NM">
+            </a>
+        </nav>
+    </header>
+
+    <div class="crud-container">
+        <h2>Lista de Carros</h2>
+        <button class="cadastrar" onclick="cadastrarCarro()">Cadastrar</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ano</th>
+                    <th>Preço</th>
+                    <th>Modelo</th>
+                    <th>Marca</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="carro-list">
+                <!-- Conteúdo dinâmico será inserido aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const lista = document.getElementById('carro-list');
+
+        const carregar = async () => {
+            try {
+
+                lista.innerHTML = '';
+
+                const response = await fetch('http://localhost:3000/api/carros', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    /* crendetials: true para cookies*/
+                });
+
+                if (!response.ok) throw new Error('Erro ao buscar carros');
+
+                const carros = await response.json();
+
+                carros.forEach(car => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${car.id}</td>
+                    <td>${car.ano}</td>
+                    <td>${car.preco}</td>
+                    <td>${car.modelo}</td>
+                    <td>${car.marca}</td>
+                    <td>
+                        <button class="editar" onclick="editarCarro(${car.id})">Editar</button>
+                        <button class="deletar" onclick="deletarCarro(${car.id})">Excluir</button>
+                    </td>
+                `;
+                    lista.appendChild(row);
+                })
+            } catch (error) {
+                console.error("Erro", error);
+                Swal.fire({
+                icon: "error",
+                title: "Erro ao carregar carros",
+                text: error.message
+                });
+            }
+        };
+
+        window.onload = carregar;
+
+        const editarCarro = async (id) => {
+            // Pegando a linha com base no ID do usuário
+            const carRow = Array.from(document.querySelectorAll('tr')).find(row => row.cells[0].textContent == id);
+
+            if (!carRow) {
+                Swal.fire('Erro', 'Carro não encontrado.', 'error');
+                return;
+            }
+
+            // Pegando os dados atuais
+            const ano = carRow.children[1].textContent;
+            const preco = carRow.children[2].textContent;
+            const modelo = carRow.children[3].textContent;
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Editar Usuário',
+                html: `
+                    <input id="swal-ano" class="swal2-input" placeholder="Ano" value="${ano}">
+                    <input id="swal-preco" class="swal2-input" placeholder="Preco" value="${preco}">
+                    <input id="swal-modelo" class="swal2-input" placeholder="Modelo" value="${modelo}">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const ano = document.getElementById('swal-ano').value.trim();
+                    const preco = document.getElementById('swal-preco').value.trim();
+                    const modelo = document.getElementById('swal-modelo').value.trim();
+
+                    return { ano, preco, modelo };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Atualizado!", result.message, "success");
+                        carregar(); // Recarrega a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível atualizar o carro.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+
+
+        const deletarCarro = async (id) => {
+            const confirmar = await Swal.fire({
+                title: "Tem certeza?",
+                text: "Você realmente deseja excluir esse carro?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir",
+                cancelButtonText: "Cancelar"
+            });
+
+            if (confirmar.isConfirmed) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Excluído!", result.message, "success");
+                        carregar(); // Atualiza a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível excluir o carro.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+        const cadastrarCarro = async () => {
+            const { value: formValues } = await Swal.fire({
+                title: 'Cadastrar Novo Usuário',
+                html: `
+                    <input id="swal-ano" class="swal2-input" placeholder="Ano">
+                    <input id="swal-preco" class="swal2-input" placeholder="Preço">
+                    <input id="swal-modelo" class="swal2-input" placeholder="Modelo">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const ano = document.getElementById('swal-ano').value.trim();
+                    const preco = document.getElementById('swal-preco').value.trim();
+                    const modelo = document.getElementById('swal-modelo').value.trim();
+
+                    return { ano, preco, modelo };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/cadastrarC', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Sucesso!", result.message, "success");
+                        carregar(); // Recarrega a lista de usuários
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível cadastrar o usuário.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+
+    </script>
+</body>
+</html>
