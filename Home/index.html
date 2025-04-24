@@ -88,14 +88,12 @@
     <nav>
       <a class="logo" href="#"><img src="IMG/Logo NM.png" alt="NM"/></a>
 
-      <!-- Botão do menu hambúrguer -->
       <button id="menu-toggle" class="menu-toggle" onclick="toggleMenu()">
         <span></span>
         <span></span>
         <span></span>
       </button>
 
-      <!-- Menu lateral -->
       <ul class="nav-list" id="navList">
         <li><a href="#about">Sobre</a></li>
         <li><a href="#models">Modelos</a></li>
@@ -142,9 +140,18 @@
   <button id="backToTop">⬆</button>
 
   <script>
+    let menuOpened = false; 
+
     function toggleMenu() {
       const navList = document.querySelector('.nav-list');
       navList.classList.toggle("active");
+      menuOpened = !menuOpened; 
+
+      if (menuOpened) {
+        document.body.style.overflow = 'hidden'; 
+      } else {
+        document.body.style.overflow = 'auto'; 
+      }
     }
 
     async function logout() {
@@ -172,12 +179,10 @@
       const navList = document.querySelector('.nav-list');
       const loginBtn = document.getElementById('login-btn');
 
-      // Move login para dentro da nav-list
-      if (window.innerWidth <= 768 && loginBtn) {
-        const clone = loginBtn.cloneNode(true);
-        clone.style.display = 'block';
-        navList.appendChild(clone);
+      if (loginBtn) {
+        loginBtn.style.display = 'block'; 
       }
+
     });
   </script>
 </body>
