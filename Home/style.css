@@ -53,6 +53,7 @@ nav {
     font-size: 28px;
     color: white;
     cursor: pointer;
+
 }
 
 .video-container {
@@ -265,6 +266,46 @@ li:hover a {
 
     .mobile-only {
         display: block !important;
+    }
+
+    .logo-image {
+        margin-left: 55px;
+        margin-top: -30px;
+    }
+
+    .venomgt-description {
+        display: none;
+        
+    }
+
+    .venomgt-title {
+        font-size: 30px !important;
+        width: 250px;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .btn-venom {
+        display: inline-block;
+        padding: 10px 30px;
+        background-color: #911924;
+        color: #ffffff;
+        font-size: 1rem;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: 0.3s;
+        margin-right: -120px !important;
+        text-transform: uppercase;
+    }
+
+    .btn-venom:hover {
+        background-color: #6d131a;
+        transform: scale(1.1);
+    }
+
+    .img-venomgt {
+        display: none !important;
     }
 }
 

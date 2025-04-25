@@ -21,6 +21,7 @@ body {
     width: 180px;
     height: auto;
     max-height: 220px;
+    margin-top: 130px;
 }
 
 nav {
@@ -109,6 +110,8 @@ nav {
     .login-container {
         margin: 60px auto;
         padding: 20px;
+
+        margin-top: 100px !important;
     }
 
     .login-container h2 {
@@ -127,6 +130,10 @@ nav {
 
     .logo img {
         width: 150px;
+    }
+
+    .logo-naja {
+        margin-top: 100px;
     }
 }
 
