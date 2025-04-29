@@ -21,7 +21,7 @@ body {
     width: 180px;
     height: auto;
     max-height: 220px;
-    margin-top: 130px;
+    margin-top: 150px;
 }
 
 nav {
@@ -40,6 +40,7 @@ nav {
     background: #000;
     text-align: center;
     border-radius: 8px;
+    margin-top: 150px;
 }
 
 .login-container h2 {
@@ -47,6 +48,7 @@ nav {
     font-size: 32px;
     text-transform: uppercase;
     margin-bottom: 20px;
+    font-weight: 400;
 }
 
 .login-container label {
