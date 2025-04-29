@@ -14,17 +14,20 @@ document.addEventListener("DOMContentLoaded", function () {
     typeEffect();
 });
 
-const images = document.querySelectorAll(".image-box img");
-let currentIndex = 0;
+document.querySelectorAll('.image-box').forEach(box => {
+    const imgs = box.querySelectorAll('img');
+    let index = 0;
 
-function changeImage() {
-    images.forEach(img => img.style.display = "none"); 
-    images[currentIndex].style.display = "block";
-    currentIndex = (currentIndex + 1) % images.length;
-}
+    // Esconde todas as imagens menos a primeira
+    imgs.forEach((img, i) => img.style.display = i === 0 ? 'block' : 'none');
 
-setInterval(changeImage, 3000); 
-changeImage();
+    // Função para alternar dentro dessa image-box
+    setInterval(() => {
+        imgs.forEach(img => img.style.display = 'none');
+        imgs[index].style.display = 'block';
+        index = (index + 1) % imgs.length;
+    }, 3000);
+});
 
 
 const backToTop = document.getElementById("backToTop");
