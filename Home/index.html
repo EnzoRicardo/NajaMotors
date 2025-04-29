@@ -16,8 +16,9 @@
 <body>
     <header>
         <nav>
-            <a class="logo" href="#"> <img src="IMG/Logo NM.png" alt="NM" class="logo-image"> </a>
-            <!-- Dentro do <nav> -->
+            <div class="nav-left">
+                <a class="logo" href="#"> <img src="IMG/Logo NM.png" alt="NM" class="logo-image"> </a>
+            </div>
             <div class="menu-toggle" id="mobile-menu">
               ☰
             </div>
@@ -30,8 +31,10 @@
                 <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
             </ul>
             
-            <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
-            <a href="./Login/login.html" class="login-btn" id="logout-btn" onclick="logout()">Logout</a>
+            <div class="nav-right">
+                <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
+                <a href="./Login/login.html" class="login-btn" id="logout-btn" onclick="logout()">Logout</a>
+            </div>
         </nav>
     </header>
 

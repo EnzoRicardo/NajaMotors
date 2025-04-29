@@ -72,11 +72,12 @@ nav {
 .nav-list {
     list-style: none;
     display: flex;
+    gap: 120px;
+    margin-left: 250px;
 }
 
 .nav-list li {
     letter-spacing: 1px;
-    margin-left: 170px;
     transition: 0.3 ease;
 }
 
@@ -277,6 +278,23 @@ footer {
     position: relative;
     bottom: 0;
     width: 100%;
+}
+
+.theme-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.theme-btn:hover {
+    transform: scale(1.2);
+}
+
+.theme-btn:active {
+    transform: scale(0.9);
 }
 
 
