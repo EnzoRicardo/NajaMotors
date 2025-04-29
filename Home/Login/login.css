@@ -55,6 +55,7 @@ nav {
     font-weight: bold;
     margin: 10px 0 5px;
     color: white;
+    text-transform: uppercase;
 }
 
 .login-container input {
@@ -94,6 +95,7 @@ nav {
     margin-top: 15px;
     font-size: 14px;
     color: #fff;
+    text-transform: uppercase;
 }
 
 .login-container a {
@@ -105,7 +107,7 @@ nav {
     text-decoration: underline;
 }
 
-/* 📱 Responsivo: Tablets e menores */
+
 @media (max-width: 768px) {
     .login-container {
         margin: 60px auto;
@@ -137,7 +139,7 @@ nav {
     }
 }
 
-/* 📱 Responsivo: Smartphones pequenos */
+
 @media (max-width: 480px) {
     .login-container {
         margin: 40px auto;
