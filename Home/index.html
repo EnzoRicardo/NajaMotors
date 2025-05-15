@@ -31,6 +31,7 @@
                 <li><a href="crud.html">CRUD</a></li>
                 <li><a href="#">Fale Conosco</a></li>
                 <li><a id="nomeUsuario"></a></li>
+                <li><a id="numeroUsuario"></a></li>
                 <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
             </ul>
             
@@ -143,7 +144,9 @@
               if (res.ok) {
                   const data = await res.json();
                   const nome = data.usuario.name;
+                  const numero = data.usuario.numero;
                   document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
+                  document.getElementById('numeroUsuario').innerText = `Numero: ${numero}`;
   
                   // Mostrar apenas Logout
                   if (loginBtn) loginBtn.style.display = 'none';
