@@ -96,3 +96,6 @@ INSERT INTO Carro (ano, preco, modelo_id) VALUES (2024, 90.0, 1);
 SELECT * FROM Usuario;
 
 SELECT * FROM Carro;
+
+-- Como adicionar mais uma coluna!
+-- ALTER TABLE (nome da tabela) ADD COLUMN (nome da coluna) (tipo da coluna)

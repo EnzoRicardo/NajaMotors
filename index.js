@@ -81,9 +81,9 @@ app.delete('/api/usuarios/:id', (req, res) => {
 // API Update
 app.put('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
-    const { nome, email, cpf, numero } = req.body;
+    const { nome, email, cpf } = req.body;
 
-    db.query('UPDATE usuario SET nome = ?, email = ?, cpf = ?, numero = ? WHERE id = ?', [nome, email, cpf, numero, id], (err, results) => {
+    db.query('UPDATE usuario SET nome = ?, email = ?, cpf = ? WHERE id = ?', [nome, email, cpf, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar usuário.' });
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     });
@@ -92,19 +92,25 @@ app.put('/api/usuarios/:id', (req, res) => {
 
 // API Create Usuário
 app.post('/api/cadastrarU', async (req, res) => {
-    const { nome, email, cpf, numero, senha } = req.body;
+    const { nome, email, cpf, senha } = req.body;
 
-    if (!nome || !email || !cpf || !numero || !senha) {
+    if (!nome || !email || !cpf  || !senha) {
         return res.status(400).json({ message: 'Os campos são obrigatórios.' });
     }
 
     const hashpass = await bcrypt.hash(senha, 10);
-    const q = `INSERT INTO usuario (nome, email, cpf, numero, senha) VALUES (?, ?, ?, ?, ?)`
+    const q = `INSERT INTO usuario (nome, email, cpf, senha) VALUES (?, ?, ?, ?)`
     
-    db.query(q, [nome,email,cpf,numero,hashpass], (err,data) => {
-        if (err) return res.json(err)
+    db.query(q, [nome,email,cpf,hashpass], (err,data) => {
+        if (err){
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(409).json({ message: 'Email ou CPF ja cadastrados.'});
+            }
+            return res.json(err)
+        } 
+            
         return res.json("Usuário registrado.")
-    })
+    });
 });
 
 app.post('/api/logout', (req, res) => {
