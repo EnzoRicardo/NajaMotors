@@ -9,6 +9,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    <script src="rotas.js">"/rotas.js"</script>
 
 
 
@@ -28,10 +29,9 @@
             <ul class="nav-list" id="nav-list">
                 <li><a href="#about">Sobre</a></li>
                 <li><a href="#models">Modelos</a></li>
-                <li><a href="crud.html">CRUD</a></li>
+                <li><a href="#" onclick="crud()">CRUD</a></li>
                 <li><a href="#">Fale Conosco</a></li>
                 <li><a id="nomeUsuario"></a></li>
-                <li><a id="numeroUsuario"></a></li>
                 <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
             </ul>
             
@@ -144,9 +144,9 @@
               if (res.ok) {
                   const data = await res.json();
                   const nome = data.usuario.name;
-                  const numero = data.usuario.numero;
+                  
                   document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
-                  document.getElementById('numeroUsuario').innerText = `Numero: ${numero}`;
+                  
   
                   // Mostrar apenas Logout
                   if (loginBtn) loginBtn.style.display = 'none';
