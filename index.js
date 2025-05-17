@@ -57,9 +57,9 @@ app.post('/api/cadastrarU', async (req, res) => {
 // API Update de usuário
 app.put('/api/usuarios/:id', (req, res) => {
     const { id } = req.params;
-    const { nome, email, cpf } = req.body;
+    const { nome, email, funcao, cpf } = req.body;
 
-    db.query('UPDATE usuario SET nome = ?, email = ?, cpf = ? WHERE id = ?', [nome, email, cpf, id], (err, results) => {
+    db.query('UPDATE usuario SET nome = ?, email = ?, cpf = ?, funcao = ? WHERE id = ?', [nome, email, cpf, funcao, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar usuário.' });
         res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
     });
@@ -136,25 +136,15 @@ app.get('/api/usuario', authMiddleware, (req, res) => {
 // API Cadastrar Carro
 
 app.post('/api/cadastrarC', (req, res) => {
-    const { ano, preco, modelo } = req.body;
+    const { ano, preco, modelo_id } = req.body;
 
-    // Buscar modelo_id
-    const buscaModelo = 'SELECT id FROM Modelo WHERE nome = ? LIMIT 1';
-
-    db.query(buscaModelo, [modelo], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(400).json({ message: 'Modelo não encontrado.' });
-        }
-
-        const modelo_id = results[0].id;
-
-        const insert = 'INSERT INTO Carro (ano, preco, modelo_id) VALUES (?, ?, ?)';
-        db.query(insert, [ano, preco, modelo_id], (err) => {
-            if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
-            res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
-        });
+    const insert = 'INSERT INTO Carro (ano, preco, modelo_id) VALUES (?, ?, ?)';
+    db.query(insert, [ano, preco, modelo_id], (err) => {
+        if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
+        res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
     });
 });
+
 
 // API Atualizar Carro
 
@@ -210,7 +200,145 @@ app.get('/api/carros', (req, res) => {
     });
 });
 
+// API listar marcas
+
+app.get('/api/marca', (req,res) => {
+    const sql = `SELECT * FROM Marca`;
+
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500),json({ message: 'Erro ao buscar marcas. '});
+        res.status(200).json(results);
+    })
+})
+
+// API Atualizar Marca
+
+app.put('/api/marca/:id', (req, res) => {
+    const { nome } = req.body;
+    const id = req.params.id;
+
+    const updateQuery = 'UPDATE Marca SET nome = ? WHERE id = ?';
+    db.query(updateQuery, [nome, id], (err) => {
+        if (err) return res.status(500).json({ message: 'Erro ao atualizar marca.' });
+        res.status(200).json({ message: 'Marca atualizada com sucesso!' });
+    });
+});
+
+
+// API Cadastrar Marca
+
+app.post('/api/cadastrarM', (req, res) => {
+    const { nome } = req.body;
+
+    const insert = 'INSERT INTO Marca (nome) VALUES (?)';
+    db.query(insert, [nome], (err) => {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({ message: 'Marca já cadastrada.' });
+            }
+            return res.status(500).json({ message: 'Erro ao cadastrar marca.' });
+        }
+        res.status(200).json({ message: 'Marca cadastrada com sucesso!' });
+    });
+});
+
+
+// API Deletar Marca
+app.delete('/api/marca/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM Marca WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao excluir Marca.' });
+        res.status(200).json({ message: 'Marca excluído com sucesso!' });
+    });
+});
+
+
 // Função Autorização
+
+function adminMiddleware(req, res, next) {
+    if (req.session.user && req.session.user.funcao === 'admin') {
+        next();
+    } else {
+        res.status(403).json({message: 'Acesso restrito: apenas administradores tem acesso.'})
+    }
+}
+
+// API Cadastrar Modelo
+
+// Criar novo modelo
+app.post('/api/cadastrarMo', (req, res) => {
+    const { nome, marca_id } = req.body;
+
+    // Validação simples
+    if (!nome || !marca_id) {
+        return res.status(400).json({ message: 'Nome e marca_id são obrigatórios.' });
+    }
+
+    const sql = 'INSERT INTO Modelo (nome, marca_id) VALUES (?, ?)';
+
+    db.query(sql, [nome, marca_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao inserir modelo:', err);
+            return res.status(500).json({ message: 'Erro ao criar modelo.' });
+        }
+
+        res.status(201).json({ 
+            message: 'Modelo criado com sucesso!',
+            id: result.insertId 
+        });
+    });
+});
+
+
+// API LISTAR modelo 2
+app.get('/api/modelos', (req, res) => {
+    const query = `
+        SELECT m.id, m.nome AS modelo, ma.nome AS marca 
+        FROM Modelo m
+        JOIN Marca ma ON m.marca_id = ma.id
+        ORDER BY ma.nome, m.nome;
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao buscar modelos.' });
+        res.status(200).json(results);
+    });
+});
+
+
+
+
+// API Listar Modelos
+app.get('/api/modelo', (req,res) => {
+    const sql = `SELECT Modelo.id as id, Modelo.nome AS modelo, Marca.nome AS marca FROM Modelo JOIN Marca ON Modelo.marca_id = Marca.id;`;
+
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500),json({ message: 'Erro ao buscar modelo. '});
+        res.status(200).json(results);
+    })
+})
+
+// Atualizar Modelo
+
+app.put('/api/modelo/:id', (req, res) => {
+    const { nome } = req.body;
+    const id = req.params.id;
+
+    const updateQuery = 'UPDATE Modelo SET nome = ? WHERE id = ?';
+    db.query(updateQuery, [nome, id], (err) => {
+        if (err) return res.status(500).json({ message: 'Erro ao atualizar modelo.' });
+        res.status(200).json({ message: 'Modelo atualizada com sucesso!' });
+    });
+});
+
+// API Deletar Modelo -- PRECISA ARRUMAR
+app.delete('/api/modelo/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM Modelo WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao excluir Modelo.' });
+        res.status(200).json({ message: 'Modelo excluído com sucesso!' });
+    });
+});
 
 function authMiddleware(req, res, next) {
     if (req.session.user) {
@@ -222,7 +350,7 @@ function authMiddleware(req, res, next) {
 
 const path = require('path');
 
-app.get('/crud', authMiddleware, (req, res) => {
+app.get('/crud', authMiddleware, adminMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'home', 'crud.html'));
 });
 

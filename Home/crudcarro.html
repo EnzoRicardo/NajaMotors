@@ -179,29 +179,46 @@
         };
 
         const cadastrarCarro = async () => {
-            const { value: formValues } = await Swal.fire({
-                title: 'Cadastrar Novo Usuário',
-                html: `
-                    <input id="swal-ano" class="swal2-input" placeholder="Ano">
-                    <input id="swal-preco" class="swal2-input" placeholder="Preço">
-                    <input id="swal-modelo" class="swal2-input" placeholder="Modelo">`,
-                focusConfirm: false,
-                preConfirm: () => {
-                    const ano = document.getElementById('swal-ano').value.trim();
-                    const preco = document.getElementById('swal-preco').value.trim();
-                    const modelo = document.getElementById('swal-modelo').value.trim();
+            try {
+                // 🔄 Buscar os modelos com marcas
+                const resModelos = await fetch('http://localhost:3000/api/modelos');
+                const modelos = await resModelos.json();
 
-                    return { ano, preco, modelo };
+                if (!resModelos.ok || modelos.length === 0) {
+                    return Swal.fire("Erro", "Nenhum modelo disponível para cadastro.", "error");
                 }
 
-            });
+                // Criar options para o select
+                const options = modelos.map(m => `<option value="${m.id}">${m.modelo} (${m.marca})</option>`).join('');
 
-            if (formValues) {
-                try {
+                const { value: formValues } = await Swal.fire({
+                    title: 'Cadastrar Novo Carro',
+                    html: `
+                        <input id="swal-ano" class="swal2-input" placeholder="Ano">
+                        <input id="swal-preco" class="swal2-input" placeholder="Preço">
+                        <select id="swal-funcao" class="swal2-input swal2-select">
+                            <option value="">Selecione um modelo</option>
+                            ${options}
+                        </select>`,
+                    focusConfirm: false,
+                    preConfirm: () => {
+                        const ano = document.getElementById('swal-ano').value.trim();
+                        const preco = document.getElementById('swal-preco').value.trim();
+                        const modelo_id = document.getElementById('swal-modelo').value;
+
+                        if (!ano || !preco || !modelo_id) {
+                            Swal.showValidationMessage("Preencha todos os campos!");
+                            return false;
+                        }
+
+                        return { ano, preco, modelo_id };
+                    }
+                });
+
+                if (formValues) {
                     const response = await fetch('http://localhost:3000/api/cadastrarC', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        
                         body: JSON.stringify(formValues)
                     });
 
@@ -209,16 +226,17 @@
 
                     if (response.ok) {
                         Swal.fire("Sucesso!", result.message, "success");
-                        carregar(); // Recarrega a lista de usuários
+                        carregar(); // Recarrega a lista
                     } else {
                         Swal.fire("Erro", result.message, "error");
                     }
-                } catch (error) {
-                    Swal.fire("Erro", "Não foi possível cadastrar o usuário.", "error");
-                    console.error(error);
                 }
+            } catch (error) {
+                Swal.fire("Erro", "Falha ao carregar modelos.", "error");
+                console.error(error);
             }
         };
+
 
 
     </script>

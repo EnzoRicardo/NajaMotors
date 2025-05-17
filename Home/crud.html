@@ -28,6 +28,7 @@
                         <th>Nome</th>
                         <th>Email</th>
                         <th>CPF</th>
+                        <th>Função</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -111,6 +112,7 @@
                     <td>${user.nome}</td>
                     <td>${user.email}</td>
                     <td>${user.cpf}</td>
+                    <td>${user.funcao}</td>
                     <td>
                         <button class="editar" onclick="editarUsuario(${user.id})">Editar</button>
                         <button class="deletar" onclick="deletarUsuario(${user.id})">Excluir</button>
@@ -143,18 +145,24 @@
             const nome = userRow.children[1].textContent;
             const email = userRow.children[2].textContent;
             const cpf = userRow.children[3].textContent;
+            const funcao = userRow.children[4].textContent;
 
             const { value: formValues } = await Swal.fire({
                 title: 'Editar Usuário',
                 html: `
                     <input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nome}">
                     <input id="swal-email" class="swal2-input" placeholder="Email" value="${email}">
-                    <input id="swal-cpf" class="swal2-input" placeholder="CPF" value="${cpf}">`,
+                    <input id="swal-cpf" class="swal2-input" placeholder="CPF" value="${cpf}">
+                    <select id="swal-funcao" class="swal2-input swal2-select">
+                        <option value="user" ${funcao == 'user' ? 'selected': ''}>Usuário</option>    
+                        <option value="admin" ${funcao == 'admin' ? 'selected': ''}>Administrador</option>    
+                    </select>`,
                 focusConfirm: false,
                 preConfirm: () => {
                     const nome = document.getElementById('swal-nome').value.trim();
                     const email = document.getElementById('swal-email').value.trim();
                     const cpf = document.getElementById('swal-cpf').value.trim();
+                    const funcao = document.getElementById('swal-funcao').value.trim();
 
                     const nomeRegex = /^[A-Za-zÀ-ÿ\s]{3,}$/;
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -180,7 +188,7 @@
                         return false;
                     }
 
-                    return { nome, email, cpf };
+                    return { nome, email, cpf, funcao };
                 }
 
             });

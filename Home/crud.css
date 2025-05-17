@@ -115,6 +115,29 @@ button.cadastrar:hover {
     transform: scale(1.05);
 }
 
+.swal2-select.swal2-input {
+    width: 63%;
+    height: 57px;
+    padding: 0 10px;
+    margin: 18px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white; /* igual ao fundo dos inputs */
+    color: black;
+    font-size: 19px;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.swal2-select.swal2-input:focus {
+    outline: none;
+    border-color: #911924;
+}
+
+
+
 /* RESPONSIVIDADE */
 @media (max-width: 768px) {
     .crud-container {

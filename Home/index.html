@@ -144,8 +144,9 @@
               if (res.ok) {
                   const data = await res.json();
                   const nome = data.usuario.name;
+                  const funcao = data.usuario.funcao;
                   
-                  document.getElementById('nomeUsuario').innerText = `Bem-vindo, ${nome}`;
+                  document.getElementById('nomeUsuario').innerText = `${funcao}: ${nome}`;
                   
   
                   // Mostrar apenas Logout

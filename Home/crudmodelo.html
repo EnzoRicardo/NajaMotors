@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD de Modelos - Naja Motors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="crud.css">
+    <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="../index.html">
+                <img src="../IMG/Logo NM.png" alt="NM">
+            </a>
+        </nav>
+    </header>
+
+    <div class="crud-container">
+        <h2>Lista de Modelos</h2>
+        <button class="cadastrar" onclick="cadastrarModelo()">Cadastrar</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Modelo</th>
+                    <th>Marca</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="modelo-list">
+                <!-- Conteúdo dinâmico será inserido aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const lista = document.getElementById('modelo-list');
+
+        const carregar = async () => {
+            try {
+
+                lista.innerHTML = '';
+
+                const response = await fetch('http://localhost:3000/api/modelo', {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            /* crendetials: true para cookies*/
+                        });
+
+
+                if (!response.ok) throw new Error('Erro ao buscar modelos');
+
+                const modelos = await response.json();
+
+                modelos.forEach(modelo => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                            <td>${modelo.id}</td>
+                            <td>${modelo.modelo}</td>
+                            <td>${modelo.marca}</td>
+                            <td>
+                                <button class="editar" onclick="editarModelo(${modelo.id})">Editar</button>
+                                <button class="deletar" onclick="deletarModelo(${modelo.id})">Excluir</button>
+                            </td>
+                        `;
+                            lista.appendChild(row);
+                        })
+            } catch (error) {
+                    console.error("Erro", error);
+                    Swal.fire({
+                    icon: "error",
+                    title: "Erro ao carregar marcas",
+                    text: error.message
+                });
+            }
+        };
+
+        window.onload = carregar;
+
+        const editarModelo = async (id) => {
+            // Pegando a linha com base no ID da Marca
+            const modeloRow = Array.from(document.querySelectorAll('tr')).find(row => row.cells[0].textContent == id);
+
+            if (!modeloRow) {
+                Swal.fire('Erro', 'Marca não encontrada.', 'error');
+                return;
+            }
+
+            // Pegando os dados atuais
+            const modelo = modeloRow.children[1].textContent;
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Editar Modelo',
+                html: `
+                    <input id="swal-modelo" class="swal2-input" placeholder="Modelo" value="${modelo}">`,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const modelo = document.getElementById('swal-modelo').value.trim();
+
+                    return { nome: modelo };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/modelo/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Atualizado!", result.message, "success");
+                        carregar(); // Recarrega a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível atualizar o modelo.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+        const deletarModelo = async (id) => {
+            const confirmar = await Swal.fire({
+                title: "Tem certeza?",
+                text: "Você realmente deseja excluir esse modelo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir",
+                cancelButtonText: "Cancelar"
+            });
+
+            if (confirmar.isConfirmed) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/modelo/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Excluído!", result.message, "success");
+                        carregar(); // Atualiza a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível excluir a marca.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+        const cadastrarModelo = async () => {
+            try {
+                // Buscar marcas do backend
+                const marcasResponse = await fetch('http://localhost:3000/api/marca');
+                if (!marcasResponse.ok) throw new Error('Erro ao carregar marcas');
+                const marcas = await marcasResponse.json();
+
+                // Criar o select com as marcas
+                const selectHtml = `
+                    <select id="swal-funcao" class="swal2-input swal2-select">
+                        <option value="">Selecione uma marca</option>
+                        ${marcas.map(marca => `<option value="${marca.id}">${marca.nome}</option>`).join('')}
+                    </select>`;
+
+                const { value: formValues } = await Swal.fire({
+                    title: 'Cadastrar Novo Modelo',
+                    html: `
+                        <input id="swal-nome" class="swal2-input" placeholder="Nome do modelo">
+                        ${selectHtml}
+                    `,
+                    focusConfirm: false,
+                    preConfirm: () => {
+                        const nome = document.getElementById('swal-nome').value.trim();
+                        const marca_id = document.getElementById('swal-marca').value;
+
+                        if (!nome || !marca_id) {
+                            Swal.showValidationMessage('Preencha todos os campos');
+                            return;
+                        }
+
+                        return { nome, marca_id };
+                    }
+                });
+
+                if (formValues) {
+                    const response = await fetch('http://localhost:3000/api/cadastrarMo', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Sucesso!", result.message, "success");
+                        carregar(); // Recarrega a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                }
+            } catch (error) {
+                Swal.fire("Erro", "Não foi possível carregar as marcas ou cadastrar o modelo.", "error");
+                console.error(error);
+            }
+        };
+
+    </script>
+    
+        
+</body>
+</html>

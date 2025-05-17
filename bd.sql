@@ -8,6 +8,7 @@ CREATE TABLE Usuario (
     nome VARCHAR(255),
     email VARCHAR(255) UNIQUE,
     cpf VARCHAR(255) UNIQUE,
+    funcao VARCHAR(20) DEFAULT 'user',
     senha VARCHAR(255)
 );
 
@@ -56,8 +57,8 @@ CREATE TABLE Pedido_Carro (
 -- Dados de exemplo
 
 -- Usuário
-INSERT INTO Usuario (nome, email, cpf, senha)
-VALUES ('Fulano', 'fulano@gmail.com', '634.871.627-92', 'Teste@123');
+INSERT INTO Usuario (nome, email, cpf, senha, funcao)
+VALUES ('admin', 'admin', '000.000.000-00', '$2b$10$H29tuCnNp9ID.bZYwohWKeBa5VBaRzHdbA5fzDnySv7Sb0GXMktNO', 'admin');
 
 -- Marcas
 INSERT INTO Marca (nome) VALUES ('Naja');
@@ -95,7 +96,6 @@ INSERT INTO Carro (ano, preco, modelo_id) VALUES (2024, 90.0, 1);
 -- Verificar usuários
 SELECT * FROM Usuario;
 
-SELECT * FROM Carro;
+SELECT * FROM Marca;
 
--- Como adicionar mais uma coluna!
--- ALTER TABLE (nome da tabela) ADD COLUMN (nome da coluna) (tipo da coluna)
+
