@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="pageCompra.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naja Motors</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="./index.html"> <img src="./IMG/Logo NM.png" alt="NM"> </a>
+        </nav>
+    </header>
+
+    <section class="carrossel-carro">
+        <div class="carrossel-container">
+            <button class="btn prev"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="images-wrapper">
+                <div class="images">
+                    <img src="./IMG/Titan 4.png" alt="">
+                    <img src="./IMG/Titan 5.png" alt="">
+                    <img src="./IMG/Titan 6.png" alt="">
+                </div>
+            </div>
+            <button class="btn next"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </section>
+
+    <h2 class="car-name">Naja Titan</h2>
+
+    <section class="destaques">
+        <div class="container-destaques">
+            <div class="item">
+                <i class="fa-solid fa-gauge-high"></i>
+                <h3>Velocidade Máxima</h3>
+                <p>210 km/h</p>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-bolt-lightning"></i>
+                <h3>Aceleração 0-100</h3>
+                <p>6.4 segundos</p>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-car-rear"></i>
+                <h3>Motor Biturbo</h3>
+                <p>V6 3.5L TwinPower - Flex</p>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-palette"></i>
+                <h3>Cores Exclusivas</h3>
+                <p>Cinza Onyx Vulcano</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sobre-carro">
+        <div class="container-sobre">
+            <h2>Força que desafia qualquer terreno</h2>
+            <p>
+                O <strong>Naja Titan</strong> nasceu para ir além do asfalto. Com estrutura reforçada, tração imponente e motor de alta performance, ele foi projetado para vencer qualquer desafio — da cidade à estrada de terra.
+            <p>
+                Robusto, inteligente e imponente, o Titan combina o poder de uma picape com a sofisticação de um Naja. Seja na lida do campo, em trilhas ou cruzando paisagens urbanas, ele entrega autoridade em cada detalhe.
+            </p>
+        </div>
+    </section>
+
+    <section class="ficha-tecnica">
+        <h2>Ficha Técnica</h2>
+        <table>
+            <tr><th>Motor</th><td>V6 Biturbo 3.5L Flex</td></tr>
+            <tr><th>Potência</th><td>420 cv</td></tr>
+            <tr><th>Câmbio</th><td>Automático de 10 marchas</td></tr>
+            <tr><th>Torque</th><td>63 kgfm</td></tr>
+            <tr><th>Tração</th><td>4x4 Inteligente</td></tr>
+            <tr><th>Consumo Médio</th><td>8,9 km/l</td></tr>
+        </table>
+    </section>
+
+    <section class="cta-compra">
+        <div class="container-cta">
+             <h2>Pronto para ter o seu Naja Titan?</h2>
+             <p>Garanta agora a picape que transforma força em atitude — e cada caminho em território conquistado.</p>
+             <a href="#" target="_blank" class="btn-compra">
+             <i class="fa-solid fa-car"></i> Comprar Agora
+             </a>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer>
+        <p>© 2025 Todos os direitos reservados.</p>
+    </footer>
+
+
+    <script>
+        const images = document.querySelector('.images');
+        const imgCount = document.querySelectorAll('.images img').length;
+        let index = 0;
+
+        document.querySelector('.next').addEventListener('click', () => {
+            index = (index + 1) % imgCount;
+            updateCarousel();
+        });
+
+        document.querySelector('.prev').addEventListener('click', () => {
+            index = (index - 1 + imgCount) % imgCount;
+            updateCarousel();
+        });
+
+        function updateCarousel() {
+            const imgWidth = document.querySelector('.images-wrapper').clientWidth;
+            images.style.transform = `translateX(-${index * imgWidth}px)`;
+        }
+
+        window.addEventListener('resize', updateCarousel);
+    </script>
+</body>
+</html>

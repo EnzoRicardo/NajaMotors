@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="pageCompra.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naja Motors</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="./index.html"> <img src="./IMG/Logo NM.png" alt="NM"> </a>
+        </nav>
+    </header>
+
+    <section class="carrossel-carro">
+        <div class="carrossel-container">
+            <button class="btn prev"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="images-wrapper">
+                <div class="images">
+                    <img src="./IMG/Viper 4.png" alt="">
+                    <img src="./IMG/Viper 5.png" alt="">
+                    <img src="./IMG/Viper 6.png" alt="">
+                </div>
+            </div>
+            <button class="btn next"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </section>
+
+    <h2 class="car-name">Naja Viper</h2>
+
+    <section class="destaques">
+        <div class="container-destaques">
+            <div class="item">
+                <i class="fa-solid fa-gauge-high"></i>
+                <h3>Velocidade Máxima</h3>
+                <p>350 km/h</p>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-bolt-lightning"></i>
+                <h3>Aceleração 0-100</h3>
+                <p>2.4 segundos</p>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-car-rear"></i>
+                <h3>Motor Biturbo</h3>
+                <p>V8 8.0L TwinPower</p>
+            </div>
+            <div class="item">
+                <i class="fa-solid fa-palette"></i>
+                <h3>Cores Exclusivas</h3>
+                <p>Metálico Cinza Cobra</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sobre-carro">
+        <div class="container-sobre">
+            <h2>Potência forjada nas ruas</h2>
+            <p>
+                O <strong>Naja Viper</strong> é mais do que um esportivo — é um ícone urbano de presença inconfundível. Seu design robusto e aerodinâmico nasce da fusão entre velocidade bruta e sofisticação selvagem.
+            </p>
+            <p>
+                Desenvolvido para dominar tanto avenidas quanto curvas fechadas, o Viper entrega torque instantâneo, estabilidade extrema e um ronco que impõe respeito. Onde quer que passe, ele não apenas acelera — ele impõe sua história.
+            </p>
+        </div>
+    </section>
+
+    <section class="ficha-tecnica">
+        <h2>Ficha Técnica</h2>
+        <table>
+            <tr><th>Motor</th><td>V8 Biturbo 8.0L</td></tr>
+            <tr><th>Potência</th><td>820 cv</td></tr>
+            <tr><th>Câmbio</th><td>Automático de 8 marchas</td></tr>
+            <tr><th>Torque</th><td>80 kgfm</td></tr>
+            <tr><th>Tração</th><td>Traseira</td></tr>
+            <tr><th>Consumo Médio</th><td>7,5 km/l</td></tr>
+        </table>
+    </section>
+
+    <section class="cta-compra">
+        <div class="container-cta">
+             <h2>Pronto para ter o seu Naja Viper?</h2>
+             <p>Garanta hoje o muscle car que transforma potência em presença, e cada trajeto em uma declaração.</p>
+             <a href="#" target="_blank" class="btn-compra">
+             <i class="fa-solid fa-car"></i> Comprar Agora
+             </a>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer>
+        <p>© 2025 Todos os direitos reservados.</p>
+    </footer>
+
+
+    <script>
+        const images = document.querySelector('.images');
+        const imgCount = document.querySelectorAll('.images img').length;
+        let index = 0;
+
+        document.querySelector('.next').addEventListener('click', () => {
+            index = (index + 1) % imgCount;
+            updateCarousel();
+        });
+
+        document.querySelector('.prev').addEventListener('click', () => {
+            index = (index - 1 + imgCount) % imgCount;
+            updateCarousel();
+        });
+
+        function updateCarousel() {
+            const imgWidth = document.querySelector('.images-wrapper').clientWidth;
+            images.style.transform = `translateX(-${index * imgWidth}px)`;
+        }
+
+        window.addEventListener('resize', updateCarousel);
+    </script>
+</body>
+</html>
