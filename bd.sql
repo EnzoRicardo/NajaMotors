@@ -32,6 +32,16 @@ CREATE TABLE Carro (
     ano INT,
     preco DECIMAL(10,2),
     modelo_id INT,
+    velocidademax INT,
+    aceleracao FLOAT,
+    motor VARCHAR(255),
+    cor VARCHAR(255),
+    potencia INT,
+    cambio VARCHAR(255),
+    torque INT,
+    tracao VARCHAR(255),
+    consumo FLOAT,
+    imagem LONGBLOB,
     FOREIGN KEY (modelo_id) REFERENCES Modelo(id) ON DELETE CASCADE
 );
 
@@ -63,12 +73,17 @@ VALUES ('admin', 'admin', '000.000.000-00', '$2b$10$H29tuCnNp9ID.bZYwohWKeBa5VBa
 -- Marcas
 INSERT INTO Marca (nome) VALUES ('Naja');
 -- Modelos
-INSERT INTO Modelo (nome, marca_id) VALUES ('Velociraptor X7', 1); -- Toyota
-INSERT INTO Modelo (nome, marca_id) VALUES ('Subnova', 1);   -- Honda
+INSERT INTO Modelo (nome, marca_id) VALUES ('Naja Striker 57', 1); 
+INSERT INTO Modelo (nome, marca_id) VALUES ('Naja Viper', 1); 
+INSERT INTO Modelo (nome, marca_id) VALUES ('Naja Titan XTR', 1);   
 
 -- Carros
-INSERT INTO Carro (ano, preco, modelo_id) VALUES (2022, 95000.00, 1); -- Corolla
-INSERT INTO Carro (ano, preco, modelo_id) VALUES (2023, 105000.00, 2); -- Civic
+INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
+			VALUES (2025, 95000.00, 1, 280, 4.8, 'V4 2.0L TwinPower', 'Metálico Cinza Cobra', 420, 'Automático de 8 marchas', 50, 'Traseira', 12.5); -- Striker
+INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
+			VALUES (2025, 105000.00, 2, 350, 2.4, 'V8 8.0 TwinPower', 'Metálico Cinza Cobra', 820, 'Automático de 8 marchas', 80, 'Traseira', 7.5); -- Viper
+INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
+			VALUES (2025, 135000.00, 3, 210, 6.4, 'V6 3.5L TwinPower - Flex', 'Cinza Onyx Vulcano', 420, 'Automático de 10 marchas', 63, '4x4 Inteligente', 8.9); -- Titan
 
 -- Pedido (realizado pelo usuário Ana)
 INSERT INTO Pedido (usuario_id, status)
@@ -81,21 +96,29 @@ VALUES (1, 1, 1), -- Corolla
 
 -- Consultas carro
 SELECT 
-    Carro.id AS carro_id,
+    Carro.id AS id,
     Marca.nome AS marca,
     Modelo.nome AS modelo,
     Carro.ano,
-    CONCAT('R$ ', FORMAT(Carro.preco, 2, 'pt_BR')) AS preco
+    preco,
+    velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
 FROM Carro
 JOIN Modelo ON Carro.modelo_id = Modelo.id
 JOIN Marca ON Modelo.marca_id = Marca.id;
-
--- Inserção de novo carro
-INSERT INTO Carro (ano, preco, modelo_id) VALUES (2024, 90.0, 1);
 
 -- Verificar usuários
 SELECT * FROM Usuario;
 
 SELECT * FROM Marca;
 
-
+SELECT 
+        Carro.id AS id,
+        Marca.nome AS marca,
+        Modelo.nome AS modelo,
+        Carro.ano,
+        preco,
+        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
+    FROM Carro
+    JOIN Modelo ON Carro.modelo_id = Modelo.id
+    JOIN Marca ON Modelo.marca_id = Marca.id
+    WHERE Carro.id = 1;
