@@ -28,6 +28,15 @@
                     <th>Preço</th>
                     <th>Modelo</th>
                     <th>Marca</th>
+                    <th>Velocidade Máxima</th>
+                    <th>Aceleração</th>
+                    <th>Motor</th>
+                    <th>Cor</th>
+                    <th>Potência</th>
+                    <th>Cambio</th>
+                    <th>Torque</th>
+                    <th>Tração</th>
+                    <th>Consumo</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -45,7 +54,7 @@
 
                 lista.innerHTML = '';
 
-                const response = await fetch('http://localhost:3000/api/carros', {
+                const response = await fetch('http://localhost:3000/api/carro', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -65,6 +74,15 @@
                     <td>${car.preco}</td>
                     <td>${car.modelo}</td>
                     <td>${car.marca}</td>
+                    <td>${car.velocidademax}</td>
+                    <td>${car.aceleracao}</td>
+                    <td>${car.motor}</td>
+                    <td>${car.cor}</td>
+                    <td>${car.potencia}</td>
+                    <td>${car.cambio}</td>
+                    <td>${car.torque}</td>
+                    <td>${car.tracao}</td>
+                    <td>${car.consumo}</td>
                     <td>
                         <button class="editar" onclick="editarCarro(${car.id})">Editar</button>
                         <button class="deletar" onclick="deletarCarro(${car.id})">Excluir</button>
@@ -97,20 +115,47 @@
             const ano = carRow.children[1].textContent;
             const preco = carRow.children[2].textContent;
             const modelo = carRow.children[3].textContent;
+            const velocidademax = carRow.children[5].textContent;
+            const aceleracao = carRow.children[6].textContent;
+            const motor = carRow.children[7].textContent;
+            const cor = carRow.children[8].textContent;
+            const potencia = carRow.children[9].textContent;
+            const cambio = carRow.children[10].textContent;
+            const torque = carRow.children[11].textContent;
+            const tracao = carRow.children[12].textContent;
+            const consumo = carRow.children[13].textContent;
 
             const { value: formValues } = await Swal.fire({
                 title: 'Editar Usuário',
                 html: `
                     <input id="swal-ano" class="swal2-input" placeholder="Ano" value="${ano}">
                     <input id="swal-preco" class="swal2-input" placeholder="Preco" value="${preco}">
-                    <input id="swal-modelo" class="swal2-input" placeholder="Modelo" value="${modelo}">`,
+                    <input id="swal-modelo" class="swal2-input" placeholder="Modelo" value="${modelo}">
+                    <input id="swal-velocidademax" class="swal2-input" placeholder="Velocidade Máxima" value="${velocidademax}">
+                    <input id="swal-aceleracao" class="swal2-input" placeholder="Aceleração" value="${aceleracao}">
+                    <input id="swal-motor" class="swal2-input" placeholder="Motor" value="${motor}">
+                    <input id="swal-cor" class="swal2-input" placeholder="Cor" value="${cor}">
+                    <input id="swal-potencia" class="swal2-input" placeholder="Potência" value="${potencia}">
+                    <input id="swal-cambio" class="swal2-input" placeholder="Cambio" value="${cambio}">
+                    <input id="swal-torque" class="swal2-input" placeholder="torque" value="${torque}">
+                    <input id="swal-tracao" class="swal2-input" placeholder="Tração" value="${tracao}">
+                    <input id="swal-consumo" class="swal2-input" placeholder="Consumo" value="${consumo}">`,
                 focusConfirm: false,
                 preConfirm: () => {
                     const ano = document.getElementById('swal-ano').value.trim();
                     const preco = document.getElementById('swal-preco').value.trim();
                     const modelo = document.getElementById('swal-modelo').value.trim();
+                    const velocidademax = document.getElementById('swal-velocidademax').value.trim();
+                    const aceleracao = document.getElementById('swal-aceleracao').value.trim();
+                    const motor = document.getElementById('swal-motor').value.trim();
+                    const cor = document.getElementById('swal-cor').value.trim();
+                    const potencia = document.getElementById('swal-potencia').value.trim();
+                    const cambio = document.getElementById('swal-cambio').value.trim();
+                    const torque = document.getElementById('swal-torque').value.trim();
+                    const tracao = document.getElementById('swal-tracao').value.trim();
+                    const consumo = document.getElementById('swal-consumo').value.trim();
 
-                    return { ano, preco, modelo };
+                    return { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo };
                 }
 
             });
@@ -196,22 +241,41 @@
                     html: `
                         <input id="swal-ano" class="swal2-input" placeholder="Ano">
                         <input id="swal-preco" class="swal2-input" placeholder="Preço">
-                        <select id="swal-funcao" class="swal2-input swal2-select">
+                        <select id="swal-modelo" class="swal2-input swal2-select">
                             <option value="">Selecione um modelo</option>
                             ${options}
-                        </select>`,
+                        </select>
+                        <input id="swal-velocidademax" class="swal2-input" placeholder="Velocidade Máxima">
+                        <input id="swal-aceleracao" class="swal2-input" placeholder="Aceleração">
+                        <input id="swal-motor" class="swal2-input" placeholder="Motor">
+                        <input id="swal-cor" class="swal2-input" placeholder="Cor">
+                        <input id="swal-potencia" class="swal2-input" placeholder="Potencia">
+                        <input id="swal-cambio" class="swal2-input" placeholder="Cambio">
+                        <input id="swal-torque" class="swal2-input" placeholder="Torque">
+                        <input id="swal-tracao" class="swal2-input" placeholder="Tração">
+                        <input id="swal-consumo" class="swal2-input" placeholder="Cpnsumo">
+                        `,
                     focusConfirm: false,
                     preConfirm: () => {
                         const ano = document.getElementById('swal-ano').value.trim();
                         const preco = document.getElementById('swal-preco').value.trim();
                         const modelo_id = document.getElementById('swal-modelo').value;
+                        const velocidademax = document.getElementById('swal-velocidademax').value.trim();
+                        const aceleracao = document.getElementById('swal-aceleracao').value.trim();
+                        const motor = document.getElementById('swal-motor').value.trim();
+                        const cor = document.getElementById('swal-cor').value.trim();
+                        const potencia = document.getElementById('swal-potencia').value.trim();
+                        const cambio = document.getElementById('swal-cambio').value.trim();
+                        const torque = document.getElementById('swal-torque').value.trim();
+                        const tracao = document.getElementById('swal-tracao').value.trim();
+                        const consumo = document.getElementById('swal-consumo').value.trim();
 
-                        if (!ano || !preco || !modelo_id) {
+                        if (!ano || !preco || !modelo_id || !velocidademax || !aceleracao || !motor || !cor || !potencia || !cambio || !torque || !tracao || !consumo) {
                             Swal.showValidationMessage("Preencha todos os campos!");
                             return false;
                         }
 
-                        return { ano, preco, modelo_id };
+                        return { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo };
                     }
                 });
 

@@ -136,10 +136,10 @@ app.get('/api/usuario', authMiddleware, (req, res) => {
 // API Cadastrar Carro
 
 app.post('/api/cadastrarC', (req, res) => {
-    const { ano, preco, modelo_id } = req.body;
+    const { ano, preco, modelo_id, velocidademax, aceleracao, motor } = req.body;
 
-    const insert = 'INSERT INTO Carro (ano, preco, modelo_id) VALUES (?, ?, ?)';
-    db.query(insert, [ano, preco, modelo_id], (err) => {
+    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(insert, [ano, preco, modelo_id, velocidademax, aceleracao, motor], (err) => {
         if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
         res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
     });
@@ -149,7 +149,7 @@ app.post('/api/cadastrarC', (req, res) => {
 // API Atualizar Carro
 
 app.put('/api/carro/:id', (req, res) => {
-    const { ano, preco, modelo } = req.body;
+    const { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
     const id = req.params.id;
 
     const buscaModelo = 'SELECT id FROM Modelo WHERE nome = ? LIMIT 1';
@@ -161,8 +161,8 @@ app.put('/api/carro/:id', (req, res) => {
 
         const modelo_id = results[0].id;
 
-        const updateQuery = 'UPDATE Carro SET ano = ?, preco = ?, modelo_id = ? WHERE id = ?';
-        db.query(updateQuery, [ano, preco, modelo_id, id], (err) => {
+        const updateQuery = 'UPDATE Carro SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, consumo = ? WHERE id = ?';
+        db.query(updateQuery, [ano, preco, modelo_id ,velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id], (err) => {
             if (err) return res.status(500).json({ message: 'Erro ao atualizar carro.' });
             res.status(200).json({ message: 'Carro atualizado com sucesso!' });
         });
@@ -181,17 +181,18 @@ app.delete('/api/carro/:id', (req, res) => {
 
 
 // API listar Carro
-app.get('/api/carros', (req, res) => {
+app.get('/api/carro', (req, res) => {
     const sql = `
-        SELECT 
-            Carro.id AS id,
-            Carro.ano,
-            CONCAT('R$ ', FORMAT(Carro.preco, 2, 'pt_BR')) AS preco,
-            Modelo.nome AS modelo,
-            Marca.nome AS marca
-        FROM Carro
-        JOIN Modelo ON Carro.modelo_id = Modelo.id
-        JOIN Marca ON Modelo.marca_id = Marca.id
+    SELECT 
+        Carro.id AS id,
+        Marca.nome AS marca,
+        Modelo.nome AS modelo,
+        Carro.ano,
+        preco,
+        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
+    FROM Carro
+    JOIN Modelo ON Carro.modelo_id = Modelo.id
+    JOIN Marca ON Modelo.marca_id = Marca.id;
     `;
 
     db.query(sql, (err, results) => {
@@ -199,6 +200,33 @@ app.get('/api/carros', (req, res) => {
         res.status(200).json(results);
     });
 });
+
+// API Listar Carro especifico
+
+app.get('/api/carros/:id', (req, res) => {
+    const id = req.params.id;
+
+    const sql = `
+    SELECT 
+        Carro.id AS id,
+        Marca.nome AS marca,
+        Modelo.nome AS modelo,
+        Carro.ano,
+        preco,
+        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
+    FROM Carro
+    JOIN Modelo ON Carro.modelo_id = Modelo.id
+    JOIN Marca ON Modelo.marca_id = Marca.id
+    WHERE Carro.id = ?;
+    `;
+
+    db.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao buscar o carro.' });
+        if (results.length === 0) return res.status(404).json({ message: 'Carro não encontrado.' });
+        res.status(200).json(results[0]);
+    });
+});
+
 
 // API listar marcas
 

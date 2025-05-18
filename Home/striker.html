@@ -29,29 +29,29 @@
         </div>
     </section>
 
-    <h2 class="car-name">Naja Striker 57</h2>
+    <h2 id="modelo" class="car-name"></h2>
 
     <section class="destaques">
         <div class="container-destaques">
             <div class="item">
                 <i class="fa-solid fa-gauge-high"></i>
                 <h3>Velocidade Máxima</h3>
-                <p>280 km/h</p>
+                <p id="velocidademax"> km/h</p>
             </div>
             <div class="item">
                 <i class="fa-solid fa-bolt-lightning"></i>
                 <h3>Aceleração 0-100</h3>
-                <p>4.8 segundos</p>
+                <p id="aceleracao"> segundos</p>
             </div>
             <div class="item">
                 <i class="fa-solid fa-car-rear"></i>
                 <h3>Motor Biturbo</h3>
-                <p>V4 2.0L TwinPower</p>
+                <p id="motor"></p>
             </div>
             <div class="item">
                 <i class="fa-solid fa-palette"></i>
                 <h3>Cores Exclusivas</h3>
-                <p>Metálico Cinza Cobra</p>
+                <p id="cor"></p>
             </div>
         </div>
     </section>
@@ -73,12 +73,12 @@
     <section class="ficha-tecnica">
         <h2>Ficha Técnica</h2>
         <table>
-            <tr><th>Motor</th><td>V4 Biturbo 2.0L</td></tr>
-            <tr><th>Potência</th><td>420 cv</td></tr>
-            <tr><th>Câmbio</th><td>Automático de 8 marchas</td></tr>
-            <tr><th>Torque</th><td>50 kgfm</td></tr>
-            <tr><th>Tração</th><td>Traseira</td></tr>
-            <tr><th>Consumo Médio</th><td>12,5 km/l</td></tr>
+            <tr><th>Motor</th><td id="motor-ficha"></td></tr>
+            <tr><th>Potência</th><td id="potencia-ficha"> cv</td></tr>
+            <tr><th>Câmbio</th><td id="cambio"></td></tr>
+            <tr><th>Torque</th><td id="torque"> kgfm</td></tr>
+            <tr><th>Tração</th><td id="tracao"></td></tr>
+            <tr><th>Consumo Médio</th><td id="consumo"> km/l</td></tr>
         </table>
     </section>
 
@@ -120,6 +120,26 @@
         }
 
         window.addEventListener('resize', updateCarousel);
+
+
+        const id = new URLSearchParams(window.location.search).get("id");
+
+        fetch(`/api/carros/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('modelo').textContent = data.modelo;
+            document.getElementById('velocidademax').textContent = data.velocidademax + " km/h";
+            document.getElementById('aceleracao').textContent = data.aceleracao + " segundos";
+            document.getElementById('motor').textContent = data.motor;
+            document.getElementById('motor-ficha').textContent = data.motor;
+            document.getElementById('potencia-ficha').textContent = data.potencia + " cv";
+            document.getElementById('cambio').textContent = data.cambio;
+            document.getElementById('cor').textContent = data.cor;
+            document.getElementById('tracao').textContent = data.tracao;
+            document.getElementById('torque').textContent = data.torque + " kgmf";
+            document.getElementById('consumo').textContent = data.consumo + " km/l";
+
+        })
     </script>
 </body>
 </html>
