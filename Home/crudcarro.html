@@ -139,9 +139,14 @@
                     <input id="swal-cambio" class="swal2-input" placeholder="Cambio" value="${cambio}">
                     <input id="swal-torque" class="swal2-input" placeholder="torque" value="${torque}">
                     <input id="swal-tracao" class="swal2-input" placeholder="Tração" value="${tracao}">
-                    <input id="swal-consumo" class="swal2-input" placeholder="Consumo" value="${consumo}">`,
+                    <input id="swal-consumo" class="swal2-input" placeholder="Consumo" value="${consumo}">
+                    <input id="swal-imagem" type="file" accept="image/*" class="swal2-file">
+                    `,
                 focusConfirm: false,
                 preConfirm: () => {
+                    const fileInput = document.getElementById('swal-imagem');
+                    const imagem = fileInput.files[0];
+
                     const ano = document.getElementById('swal-ano').value.trim();
                     const preco = document.getElementById('swal-preco').value.trim();
                     const modelo = document.getElementById('swal-modelo').value.trim();
@@ -155,34 +160,44 @@
                     const tracao = document.getElementById('swal-tracao').value.trim();
                     const consumo = document.getElementById('swal-consumo').value.trim();
 
-                    return { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo };
+                    return { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
                 }
 
             });
 
             if (formValues) {
-                try {
+                    console.log("Enviando os dados do carro:", formValues);
+                    console.log("Imagem:", formValues.imagem);
+
+                    const formData = new FormData();
+                    formData.append("ano", formValues.ano);
+                    formData.append("preco", formValues.preco);
+                    formData.append("modelo", formValues.modelo);
+                    formData.append("velocidademax", formValues.velocidademax);
+                    formData.append("aceleracao", formValues.aceleracao);
+                    formData.append("motor", formValues.motor);
+                    formData.append("cor", formValues.cor);
+                    formData.append("potencia", formValues.potencia);
+                    formData.append("cambio", formValues.cambio);
+                    formData.append("torque", formValues.torque);
+                    formData.append("tracao", formValues.tracao);
+                    formData.append("consumo", formValues.consumo);
+                    formData.append("imagem", formValues.imagem);
+
                     const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        
-                        body: JSON.stringify(formValues)
+                        body: formData
                     });
 
                     const result = await response.json();
 
-                    if (response.ok) {
-                        Swal.fire("Atualizado!", result.message, "success");
-                        carregar(); // Recarrega a lista
+                    if(response.ok) {
+                        Swal.fire("Sucesso!", result.message, "success");
+                        carregar();
                     } else {
                         Swal.fire("Erro", result.message, "error");
                     }
-
-                } catch (error) {
-                    Swal.fire("Erro", "Não foi possível atualizar o carro.", "error");
-                    console.error(error);
                 }
-            }
         };
 
 
@@ -253,10 +268,14 @@
                         <input id="swal-cambio" class="swal2-input" placeholder="Cambio">
                         <input id="swal-torque" class="swal2-input" placeholder="Torque">
                         <input id="swal-tracao" class="swal2-input" placeholder="Tração">
-                        <input id="swal-consumo" class="swal2-input" placeholder="Cpnsumo">
+                        <input id="swal-consumo" class="swal2-input" placeholder="Consumo">
+                        <input id="swal-imagem" type="file" accept="image/*" class="swal2-file">
                         `,
                     focusConfirm: false,
                     preConfirm: () => {
+                        const fileInput = document.getElementById('swal-imagem');
+                        const imagem = fileInput.files[0];
+
                         const ano = document.getElementById('swal-ano').value.trim();
                         const preco = document.getElementById('swal-preco').value.trim();
                         const modelo_id = document.getElementById('swal-modelo').value;
@@ -270,27 +289,44 @@
                         const tracao = document.getElementById('swal-tracao').value.trim();
                         const consumo = document.getElementById('swal-consumo').value.trim();
 
-                        if (!ano || !preco || !modelo_id || !velocidademax || !aceleracao || !motor || !cor || !potencia || !cambio || !torque || !tracao || !consumo) {
+                        if (!ano || !preco || !modelo_id || !velocidademax || !aceleracao || !motor || !cor || !potencia || !cambio || !torque || !tracao || !consumo || !imagem) {
                             Swal.showValidationMessage("Preencha todos os campos!");
                             return false;
                         }
 
-                        return { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo };
+                        return { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
                     }
                 });
 
                 if (formValues) {
+                    console.log("Enviando os dados do carro:", formValues);
+                    console.log("Imagem:", formValues.imagem);
+
+                    const formData = new FormData();
+                    formData.append("ano", formValues.ano);
+                    formData.append("preco", formValues.preco);
+                    formData.append("modelo_id", formValues.modelo_id);
+                    formData.append("velocidademax", formValues.velocidademax);
+                    formData.append("aceleracao", formValues.aceleracao);
+                    formData.append("motor", formValues.motor);
+                    formData.append("cor", formValues.cor);
+                    formData.append("potencia", formValues.potencia);
+                    formData.append("cambio", formValues.cambio);
+                    formData.append("torque", formValues.torque);
+                    formData.append("tracao", formValues.tracao);
+                    formData.append("consumo", formValues.consumo);
+                    formData.append("imagem", formValues.imagem);
+
                     const response = await fetch('http://localhost:3000/api/cadastrarC', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formValues)
+                        body: formData
                     });
 
                     const result = await response.json();
 
-                    if (response.ok) {
+                    if(response.ok) {
                         Swal.fire("Sucesso!", result.message, "success");
-                        carregar(); // Recarrega a lista
+                        carregar();
                     } else {
                         Swal.fire("Erro", result.message, "error");
                     }

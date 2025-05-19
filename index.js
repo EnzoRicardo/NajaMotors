@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const { message } = require('statuses');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
 
 
@@ -29,6 +31,9 @@ const db = mysql.createConnection({
     password: 'PUC@1234',
     database: 'najamotors'
 });
+
+
+
 
 // API Cadastro de usuário
 app.post('/api/cadastrarU', async (req, res) => {
@@ -135,11 +140,22 @@ app.get('/api/usuario', authMiddleware, (req, res) => {
 
 // API Cadastrar Carro
 
-app.post('/api/cadastrarC', (req, res) => {
-    const { ano, preco, modelo_id, velocidademax, aceleracao, motor } = req.body;
+app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
+    console.log('Dados recebidos no cadastro de carro:');
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
 
-    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(insert, [ano, preco, modelo_id, velocidademax, aceleracao, motor], (err) => {
+
+    const { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+
+    const imagemBuffer = req.file ? req.file.buffer : null;
+
+     if (!req.file) {
+        console.log("Nenhuma imagem foi enviada.");
+    }
+
+    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(insert, [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer], (err) => {
         if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
         res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
     });
@@ -148,9 +164,10 @@ app.post('/api/cadastrarC', (req, res) => {
 
 // API Atualizar Carro
 
-app.put('/api/carro/:id', (req, res) => {
+app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
     const { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
     const id = req.params.id;
+    const imagemBuffer = req.file ? req.file.buffer : null;
 
     const buscaModelo = 'SELECT id FROM Modelo WHERE nome = ? LIMIT 1';
     
@@ -161,9 +178,32 @@ app.put('/api/carro/:id', (req, res) => {
 
         const modelo_id = results[0].id;
 
-        const updateQuery = 'UPDATE Carro SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, consumo = ? WHERE id = ?';
-        db.query(updateQuery, [ano, preco, modelo_id ,velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id], (err) => {
-            if (err) return res.status(500).json({ message: 'Erro ao atualizar carro.' });
+        let updateQuery;
+        let params;
+
+        if (imagemBuffer) {
+            updateQuery = `
+                UPDATE Carro 
+                SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, 
+                    motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
+                    consumo = ?, imagem = ?
+                WHERE id = ?`;
+            params = [ano, preco, modelo_id ,velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id];
+        } else {
+            updateQuery = `
+                UPDATE Carro 
+                SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, 
+                    motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
+                    consumo = ?
+                WHERE id = ?`;
+            params = [ano, preco, modelo_id ,velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id];
+        }
+
+        db.query(updateQuery, params, (err) => {
+            if (err) {
+                console.error('Erro ao atualizar carro:', err);
+                return res.status(500).json({ message: 'Erro ao atualizar carro.' });
+            }
             res.status(200).json({ message: 'Carro atualizado com sucesso!' });
         });
     });

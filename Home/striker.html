@@ -20,9 +20,7 @@
             <button class="btn prev"><i class="fa-solid fa-arrow-left"></i></button>
             <div class="images-wrapper">
                 <div class="images">
-                    <img src="./IMG/Striker 4.png" alt="">
-                    <img src="./IMG/Striker 5.png" alt="">
-                    <img src="./IMG/Striker 6.png" alt="">
+                    
                 </div>
             </div>
             <button class="btn next"><i class="fa-solid fa-arrow-right"></i></button>
@@ -100,28 +98,6 @@
 
 
     <script>
-        const images = document.querySelector('.images');
-        const imgCount = document.querySelectorAll('.images img').length;
-        let index = 0;
-
-        document.querySelector('.next').addEventListener('click', () => {
-            index = (index + 1) % imgCount;
-            updateCarousel();
-        });
-
-        document.querySelector('.prev').addEventListener('click', () => {
-            index = (index - 1 + imgCount) % imgCount;
-            updateCarousel();
-        });
-
-        function updateCarousel() {
-            const imgWidth = document.querySelector('.images-wrapper').clientWidth;
-            images.style.transform = `translateX(-${index * imgWidth}px)`;
-        }
-
-        window.addEventListener('resize', updateCarousel);
-
-
         const id = new URLSearchParams(window.location.search).get("id");
 
         fetch(`/api/carros/${id}`)
@@ -139,7 +115,64 @@
             document.getElementById('torque').textContent = data.torque + " kgmf";
             document.getElementById('consumo').textContent = data.consumo + " km/l";
 
-        })
+        });
+
+        const images = document.querySelector('.images');
+        let index = 0;
+
+
+
+        // Insere as imagens dinamicamente conforme o id
+        if (id === "1") {
+            images.innerHTML = `
+                <img src="./IMG/Striker 4.png" alt="Imagem 1">
+                <img src="./IMG/Striker 5.png" alt="Imagem 2">
+                <img src="./IMG/Striker 6.png" alt="Imagem 3">
+            `;
+        } else if (id === "2") {
+            images.innerHTML = `
+                <img src="./IMG/Viper 4.png" alt="Imagem 1">
+                <img src="./IMG/Viper 5.png" alt="Imagem 2">
+                <img src="./IMG/Viper 6.png" alt="Imagem 3">
+            `;
+        } else if (id === "3") {
+            images.innerHTML = `
+                <img src="./IMG/Titan 4.png" alt="Imagem 1">
+                <img src="./IMG/Titan 5.png" alt="Imagem 2">
+                <img src="./IMG/Titan 6.png" alt="Imagem 3">
+            `;
+        } else {
+            images.innerHTML = `
+                <img src="./IMG/default.png" alt="Imagem padrão">
+            `;
+        }
+
+        // Agora que as imagens estão no DOM, calcular a quantidade
+        const imgCount = document.querySelectorAll('.images img').length;
+
+        // Função para atualizar o carrossel
+        function updateCarousel() {
+            const imgWidth = document.querySelector('.images-wrapper').clientWidth;
+            images.style.transform = `translateX(-${index * imgWidth}px)`;
+        }
+
+        // Event listeners para os botões
+        document.querySelector('.next').addEventListener('click', () => {
+            index = (index + 1) % imgCount;
+            updateCarousel();
+        });
+
+        document.querySelector('.prev').addEventListener('click', () => {
+            index = (index - 1 + imgCount) % imgCount;
+            updateCarousel();
+        });
+
+        // Ajustar ao redimensionar a tela
+        window.addEventListener('resize', updateCarousel);
+
+        // Atualiza o carrossel para a posição inicial
+        updateCarousel();
+
     </script>
 </body>
 </html>
