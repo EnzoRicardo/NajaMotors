@@ -26,12 +26,22 @@ CREATE TABLE Modelo (
     FOREIGN KEY (marca_id) REFERENCES Marca(id) ON DELETE CASCADE
 );
 
+CREATE TABLE Texto (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    descricao1 TEXT,
+    descricao2 TEXT,
+    descricao3 TEXT,
+    titulo1 TEXT,
+    titulo2 TEXT
+);
+
 -- Carro
 CREATE TABLE Carro (
     id INT PRIMARY KEY AUTO_INCREMENT,
     ano INT,
     preco DECIMAL(10,2),
     modelo_id INT,
+    texto_id INT,
     velocidademax INT,
     aceleracao FLOAT,
     motor VARCHAR(255),
@@ -41,8 +51,9 @@ CREATE TABLE Carro (
     torque INT,
     tracao VARCHAR(255),
     consumo FLOAT,
-    imagem LONGBLOB,
-    FOREIGN KEY (modelo_id) REFERENCES Modelo(id) ON DELETE CASCADE
+    imagem LONGBLOB DEFAULT NULL,
+    FOREIGN KEY (modelo_id) REFERENCES Modelo(id) ON DELETE CASCADE,
+    FOREIGN KEY (texto_id) REFERENCES Texto(id)
 );
 
 -- Pedido
@@ -77,13 +88,26 @@ INSERT INTO Modelo (nome, marca_id) VALUES ('Naja Striker 57', 1);
 INSERT INTO Modelo (nome, marca_id) VALUES ('Naja Viper', 1); 
 INSERT INTO Modelo (nome, marca_id) VALUES ('Naja Titan XTR', 1);   
 
+INSERT INTO Texto (descricao1, descricao2, descricao3, titulo1, titulo2)  VALUES ('O {modelo} não é apenas um carro. Ele é uma afirmação. Com um design agressivo,
+                engenharia de precisão e alma esportiva, ele entrega o equilíbrio perfeito entre performance e presença.','Cada curva do seu chassi é moldada com propósito. Cada detalhe do seu interior foi desenhado
+                para elevar o padrão. Seja na estrada, na cidade ou no seu imaginário, o Striker 57 nasceu para marcar território.','Adquira agora mesmo o superesportivo que redefine o seu conceito de liberdade.','Uma máquina criada para dominar','Pronto para ter o seu Naja Striker 57?');
+
+INSERT INTO Texto (descricao1, descricao2, descricao3, titulo1, titulo2)  VALUES ('O {modelo} é mais do que um esportivo — é um ícone urbano de presença inconfundível. Seu design robusto e aerodinâmico nasce da fusão entre velocidade bruta e sofisticação selvagem.', 'Desenvolvido para dominar tanto avenidas quanto curvas fechadas, o Viper entrega torque instantâneo, estabilidade extrema e um ronco que impõe respeito. Onde quer que passe, ele não apenas acelera — ele impõe sua história.', 'Garanta hoje o muscle car que transforma potência em presença, e cada trajeto em uma declaração.', 'Potência forjada nas ruas', 'Pronto para ter o seu Naja Viper?');
+
+INSERT INTO Texto (descricao1, descricao2, descricao3, titulo1, titulo2)  VALUES ('O {modelo} nasceu para ir além do asfalto. Com estrutura reforçada, tração imponente e motor de alta performance, ele foi projetado para vencer qualquer desafio — da cidade à estrada de terra.', 
+																				  'Robusto, inteligente e imponente, o Titan combina o poder de uma picape com a sofisticação de um Naja. Seja na lida do campo, em trilhas ou cruzando paisagens urbanas, ele entrega autoridade em cada detalhe.', 
+                                                                                  'Garanta agora a picape que transforma força em atitude — e cada caminho em território conquistado.', 
+                                                                                  'Força que desafia qualquer terreno', 
+                                                                                  'Pronto para ter o seu Naja Titan?');
+
 -- Carros
-INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
-			VALUES (2025, 95000.00, 1, 280, 4.8, 'V4 2.0L TwinPower', 'Metálico Cinza Cobra', 420, 'Automático de 8 marchas', 50, 'Traseira', 12.5); -- Striker
-INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
-			VALUES (2025, 105000.00, 2, 350, 2.4, 'V8 8.0 TwinPower', 'Metálico Cinza Cobra', 820, 'Automático de 8 marchas', 80, 'Traseira', 7.5); -- Viper
-INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
-			VALUES (2025, 135000.00, 3, 210, 6.4, 'V6 3.5L TwinPower - Flex', 'Cinza Onyx Vulcano', 420, 'Automático de 10 marchas', 63, '4x4 Inteligente', 8.9); -- Titan
+INSERT INTO Carro (ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
+			VALUES (2025, 95000.00, 1, 1, 280, 4.8, 'V4 2.0L TwinPower', 'Metálico Cinza Cobra', 420, 'Automático de 8 marchas', 50, 'Traseira', 12.5); -- Striker
+INSERT INTO Carro (ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
+			VALUES (2025, 105000.00, 2, 2, 350, 2.4, 'V8 8.0 TwinPower', 'Metálico Cinza Cobra', 820, 'Automático de 8 marchas', 80, 'Traseira', 7.5); -- Viper
+INSERT INTO Carro (ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo) 
+			VALUES (2025, 135000.00, 3, 3, 210, 6.4, 'V6 3.5L TwinPower - Flex', 'Cinza Onyx Vulcano', 420, 'Automático de 10 marchas', 63, '4x4 Inteligente', 8.9); -- Titan
+
 
 -- Pedido (realizado pelo usuário Ana)
 INSERT INTO Pedido (usuario_id, status)
@@ -97,28 +121,35 @@ VALUES (1, 1, 1), -- Corolla
 -- Consultas carro
 SELECT 
     Carro.id AS id,
+    Texto.id AS texto_id,
     Marca.nome AS marca,
     Modelo.nome AS modelo,
     Carro.ano,
     preco,
-    velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
+    velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem,
+    Texto.descricao1 AS descricao1
 FROM Carro
 JOIN Modelo ON Carro.modelo_id = Modelo.id
-JOIN Marca ON Modelo.marca_id = Marca.id;
+JOIN Marca ON Modelo.marca_id = Marca.id
+JOIN Texto on Carro.texto_id = Texto.id;
 
+SELECT 
+	Carro.id AS id,
+    Texto.descricao1,
+    Texto.descricao2,
+    Texto.descricao3,
+    Texto.titulo1,
+    Texto.titulo2
+FROM Carro
+JOIN Texto on Carro.texto_id = Texto.id;
+
+SELECT * FROM Texto;
 -- Verificar usuários
 SELECT * FROM Usuario;
 
 SELECT * FROM Marca;
 
-SELECT 
-        Carro.id AS id,
-        Marca.nome AS marca,
-        Modelo.nome AS modelo,
-        Carro.ano,
-        preco,
-        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
-    FROM Carro
-    JOIN Modelo ON Carro.modelo_id = Modelo.id
-    JOIN Marca ON Modelo.marca_id = Marca.id
-    WHERE Carro.id = 1;
+SELECT * FROM Modelo;
+
+INSERT INTO Modelo (nome, marca_id) VALUES ('ola', 1)
+

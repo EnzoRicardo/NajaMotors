@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD de Usuários - Naja Motors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="crud.css">
+    <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="./index.html">
+                <img src="IMG/Logo NM.png" alt="NM">
+            </a>
+
+            <ul class="nav-list" id="nav-list">
+                <li><a href="/crudcarro.html">Crud Carro</a></li>
+                <li><a href="/crudmodelo.html">Crud Modelo</a></li>
+                <li><a href="/crudmarca.html">Crud Marca</a></li>
+                <li><a href="/crud.html">Crud Usuario</a></li>
+                <li><a href="/pedidos.html">Pedidos</a></li>
+                <li><a id="nomeUsuario"></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="crud-container">
+        <h2>Lista de Textos</h2>
+        <button class="cadastrar" onclick="cadastrarTexto()">Cadastrar</button>
+        <table>
+            <div class="table-wrapper">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Titulo 1</th>
+                        <th>Titulo 2</th>
+                        <th>Descrição 1</th>
+                        <th>Descrição 2</th>
+                        <th>Descrição 3</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+            </div>
+            <tbody id="text-list">
+                <!-- Conteúdo dinâmico será inserido aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+
+<script> 
+    const carregar = async () => {
+            const lista = document.getElementById('text-list');
+
+            try {
+
+                lista.innerHTML = '';
+
+                const response = await fetch('http://localhost:3000/api/texto', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    /* crendetials: true para cookies*/
+                });
+
+                if (!response.ok) throw new Error('Erro ao buscar textos');
+
+                const textos = await response.json();
+
+                textos.forEach(texto => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${texto.id}</td>
+                    <td>${texto.titulo1}</td>
+                    <td>${texto.titulo2}</td>
+                    <td>${texto.descricao1}</td>
+                    <td>${texto.descricao2}</td>
+                    <td>${texto.descricao3}</td>
+                    <td>
+                        <button class="editar" onclick="editarTexto(${texto.id})">Editar</button>
+                        <button class="deletar" onclick="deletarTexto(${texto.id})">Excluir</button>
+                    </td>
+                    `;
+                    lista.appendChild(row);
+                })
+            } catch (error) {
+                console.error("Erro", error);
+                Swal.fire({
+                icon: "error",
+                title: "Erro ao carregar textos",
+                text: error.message
+                });
+            }
+        };
+
+        window.onload = carregar;
+
+        const editarTexto = async (id) => {
+            // Pegando a linha com base no ID do usuário
+            const textoRow = Array.from(document.querySelectorAll('tr')).find(row => row.cells[0].textContent == id);
+
+            if (!textoRow) {
+                Swal.fire('Erro', 'Texto não encontrado.', 'error');
+                return;
+            }
+
+            // Pegando os dados atuais
+            const titulo1 = textoRow.children[1].textContent;
+            const titulo2 = textoRow.children[2].textContent;
+            const descricao1 = textoRow.children[3].textContent;
+            const descricao2 = textoRow.children[4].textContent;
+            const descricao3 = textoRow.children[5].textContent;
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Editar Texto',
+                html: `
+                    <input id="swal-titulo1" class="swal2-input" placeholder="Titulo 1" value="${titulo1}">
+                    <input id="swal-titulo2" class="swal2-input" placeholder="Titulo 2" value="${titulo2}">
+                    <input id="swal-descricao1" class="swal2-input" placeholder="Descrição 1" value="${descricao1}">
+                    <input id="swal-descricao2" class="swal2-input" placeholder="Descrição 2" value="${descricao2}">
+                    <input id="swal-descricao3" class="swal2-input" placeholder="Descrição 3" value="${descricao3}">
+                    `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const titulo1 = document.getElementById('swal-titulo1').value.trim();
+                    const titulo2 = document.getElementById('swal-titulo2').value.trim();
+                    const descricao1 = document.getElementById('swal-descricao1').value.trim();
+                    const descricao2 = document.getElementById('swal-descricao2').value.trim();
+                    const descricao3 = document.getElementById('swal-descricao3').value.trim();
+
+                    return { titulo1, titulo2, descricao1, descricao2, descricao3 };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/texto/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Atualizado!", result.message, "success");
+                        carregar(); // Recarrega a lista
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível atualizar o texto.", "error");
+                    console.error(error);
+                }
+            }
+        };
+
+        const cadastrarTexto = async () => {
+            const { value: formValues } = await Swal.fire({
+                title: 'Cadastrar Novo Texto',
+                html: `
+                    <input id="swal-titulo1" class="swal2-input" placeholder="Titulo 1">
+                    <input id="swal-titulo2" class="swal2-input" placeholder="Titulo 2">
+                    <input id="swal-descricao1" class="swal2-input" placeholder="Descrição 1">
+                    <input id="swal-descricao2" class="swal2-input" placeholder="Descrição 2">
+                    <input id="swal-descricao3" class="swal2-input" placeholder="Descrição 3">
+                    `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const titulo1 = document.getElementById('swal-titulo1').value.trim();
+                    const titulo2 = document.getElementById('swal-titulo2').value.trim();
+                    const descricao1 = document.getElementById('swal-descricao1').value.trim();
+                    const descricao2 = document.getElementById('swal-descricao2').value.trim();
+                    const descricao3 = document.getElementById('swal-descricao3').value.trim();
+                    
+
+                    return { titulo1, titulo2, descricao1, descricao2, descricao3 };
+                }
+
+            });
+
+            if (formValues) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/cadastrarT', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(formValues)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire("Sucesso!", result.message, "success");
+                        carregar(); // Recarrega a lista de usuários
+                    } else {
+                        Swal.fire("Erro", result.message, "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Erro", "Não foi possível cadastrar o texto.", "error");
+                    console.error(error);
+                }
+            }
+        };
+    
+</script>

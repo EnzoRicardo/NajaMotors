@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naja Motors</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pedidos.css">
     <link rel="icon" href="./IMG/Logo NM.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
@@ -17,7 +17,7 @@
     <header>
         <nav>
             <div class="nav-left">
-                <a class="logo" href="#"> <img src="IMG/Logo NM.png" alt="NM" class="logo-image"> </a>
+                <a class="logo" href="/"> <img src="IMG/Logo NM.png" alt="NM" class="logo-image"> </a>
             </div>
 
             <div class="menu-toggle" id="mobile-menu">
@@ -29,7 +29,6 @@
                 <li><a href="#about">Sobre</a></li>
                 <li><a href="#models">Modelos</a></li>
                 <li id="crud-item" style="display: none;"><a href="#" onclick="crud()">CRUD</a></li>
-                <li id="pedidos-item" style="display: none;"><a href="/pedidos.html">Pedidos</a></li>
                 <li><a href="#">Fale Conosco</a></li>
                 <li><a id="nomeUsuario"></a></li>
                 <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
@@ -42,68 +41,19 @@
         </nav>
     </header>
 
-    <div class="video-container">
-        <video autoplay loop muted>
-            <source src="Videos/3752531-hd_1920_1080_24fps.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos.
-        </video>
-    </div>
 
     <div class="divider"></div>
 
-    <section id="about" class="about">
-        <div class="container">
-            <h2 id="about-title"></h2>
-            <p>A Naja Motors nasceu com um propósito claro: redefinir o conceito de potência, design e exclusividade no mundo automotivo. Inspirada na ousadia dos muscle cars clássicos e na inovação dos superesportivos modernos, nossa marca combina engenharia de ponta com um espírito indomável.</p>
-            <p>Cada modelo produzido carrega a essência da Naja Motors: desempenho brutal, design marcante e tecnologia avançada. Não construímos apenas carros, criamos máquinas que despertam emoção a cada aceleração.</p>
-            <p>Seja nas ruas ou nas pistas, a Naja Motors é para aqueles que não aceitam o comum. Para quem vive com intensidade e faz da estrada o seu território.</p>
-        </div>
-    </section>
+    <main class="pedido-container">
+        <h2>Buscar Pedido</h2>
+        <input type="text" id="buscaCarro" placeholder="Digite o nome do carro..." />
 
-    <div class="divider"></div>
-    
-    <section id="models" class="car-model">
-        <div class="text-box">
-            <h2 class="car-title">Naja Striker</h2>
-            <p class="car-description">Potência, ousadia e sofisticação se unem neste esportivo criado para desafiar padrões. Com linhas aerodinâmicas, resposta rápida e uma presença imponente, o <span class="red-strong">Striker S7</span> é a escolha de quem transforma cada trajeto em uma experiência única.</p>
-            <a href="striker.html?id=1" class="btn-car">confira</a>
+        <div id="lista-carros" class="carros-container">
+            <!-- Carros aparecerão aqui -->
         </div>
-        <div class="image-box">
-            <img src="IMG/Naja Striker.png" class="car-image" loading="lazy">
-            <img src="IMG/Naja Striker 2.png" class="car-image" loading="lazy">
-            <img src="IMG/Naja Striker 3.png" class="car-image" loading="lazy">
-        </div>
-    </section>
+    </main>
 
-    <div class="divider"></div>
 
-    <section id="models" class="car-model">
-        <div class="text-box">
-            <h2 class="car-title">Naja Viper</h2>
-            <p class="car-description">A Naja Motors apresenta o Viper X9, o puro-sangue da velocidade. Inspirado na ferocidade da naja e no DNA dos muscle cars mais lendários, o <span class="red-strong">Viper X9</span> traz uma fusão extrema entre força bruta, aerodinâmica de competição e tecnologia de ponta.</p>
-            <a href="striker.html?id=2" class="btn-car">confira</a>
-        </div>
-        <div class="image-box">
-            <img src="IMG/Naja Viper.png" class="car-image" loading="lazy">
-            <img src="IMG/Naja Viper 2.png" class="car-image" loading="lazy">
-            <img src="IMG/Naja Viper 3.png" class="car-image" loading="lazy">
-        </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <section id="models" class="car-model">
-        <div class="text-box">
-            <h2 class="car-title">Naja Titan XTR</h2>
-            <p class="car-description">A Naja Motors apresenta a <span class="red-strong">Titan XTR</span> , a picape feita para os grandes desafios. Com linhas robustas, motor de alta potência e tecnologia de ponta, a Titan XTR foi desenhada para quem transforma trabalho duro e aventura em estilo de vida</p>
-            <a href="striker.html?id=3" class="btn-car">confira</a>
-        </div>
-        <div class="image-box">
-            <img src="IMG/Naja Titan TRX.png" class="car-image" loading="lazy">
-            <img src="IMG/Naja Titan 2.png" class="car-image" loading="lazy">
-            <img src="IMG/Naja Titan 3.png" class="car-image" loading="lazy">
-        </div>
-    </section>
 
     <div class="divider"></div>
 
@@ -132,6 +82,121 @@
   
       // Unificação do carregamento e controle de login/logout
       window.onload = async () => {
+          try {
+              const res = await fetch('http://localhost:3000/api/usuario', {
+                  credentials: 'include'
+              });
+  
+              const loginBtn = document.getElementById('login-btn');
+              const logoutBtn = document.getElementById('logout-btn');
+              const loginItem = document.getElementById('login-item');
+  
+              if (res.ok) {
+                  const data = await res.json();
+                  const nome = data.usuario.name;
+                  const funcao = data.usuario.funcao;
+                  
+                  document.getElementById('nomeUsuario').innerText = `${funcao}: ${nome}`;
+                  
+  
+                  // Mostrar apenas Logout
+                  if (loginBtn) loginBtn.style.display = 'none';
+                  if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                  if (loginItem) {
+                      loginItem.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
+                  }
+              } else {
+                  // Mostrar apenas Login
+                  if (loginBtn) loginBtn.style.display = 'inline-block';
+                  if (logoutBtn) logoutBtn.style.display = 'none';
+                  if (loginItem) {
+                      loginItem.innerHTML = `<a href="./Login/login.html">Login</a>`;
+                  }
+              }
+          } catch (error) {
+              console.error('Erro ao buscar usuário:', error);
+              // Fallback: mostra apenas login
+              if (document.getElementById('login-btn')) document.getElementById('login-btn').style.display = 'inline-block';
+              if (document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
+              if (document.getElementById('login-item')) {
+                  document.getElementById('login-item').innerHTML = `<a href="./Login/login.html">Login</a>`;
+              }
+          }
+      };
+  
+      async function logout() {
+          const res = await fetch('http://localhost:3000/api/logout', {
+              method: 'POST',
+              credentials: 'include'
+          });
+  
+          if (res.ok) {
+              window.location.href = './Login/login.html';
+          } else {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Erro',
+                  text: 'Falha ao fazer logout.'
+              });
+          }
+      }
+
+  
+    let carrosCache = []; // variável global para guardar os carros já carregados
+
+async function carregarCarros() {
+    try {
+        const res = await fetch('http://localhost:3000/api/carros');
+        const carros = await res.json();
+
+        carrosCache = carros; // guarda os carros
+
+        mostrarCarros(carros);
+    } catch (error) {
+        console.error('Erro ao carregar carros:', error);
+    }
+}
+
+function mostrarCarros(carros) {
+        const lista = document.getElementById('lista-carros');
+        lista.innerHTML = ''; // limpa a lista
+
+        carros.forEach(carro => {
+            const item = document.createElement('div');
+            item.classList.add('carro-item');
+
+            item.innerHTML = `
+                <img src="${carro.imagem}" alt="${carro.nome}">
+                <div class="carro-info">
+                    <h3>${carro.nome}</h3>
+                    <p>Preço: R$ ${parseFloat(carro.preco).toFixed(2)}</p>
+                </div>
+                <button class="btn-visualizar" onclick="window.location.href='striker.html?id=${carro.id}'">Ver carro</button>
+                <button class="btn-comprar">Comprar</button>
+            `;
+
+
+            lista.appendChild(item);
+        });
+    }
+
+    // Função para filtrar carros pelo nome
+    function filtrarCarros() {
+        const texto = document.getElementById('buscaCarro').value.toLowerCase();
+
+        // filtra carros que contenham o texto digitado no nome
+        const filtrados = carrosCache.filter(carro => carro.nome.toLowerCase().includes(texto));
+
+        mostrarCarros(filtrados);
+    }
+
+    // Evento para capturar a digitação no input
+    document.getElementById('buscaCarro').addEventListener('input', filtrarCarros);
+
+    // Carrega os carros na inicialização
+    carregarCarros();
+
+    window.onload = async () => {
           try {
               const res = await fetch('http://localhost:3000/api/usuario', {
                   credentials: 'include'
@@ -200,6 +265,7 @@
               });
           }
       }
+
   </script>
   
       

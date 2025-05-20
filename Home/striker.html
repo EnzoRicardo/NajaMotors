@@ -56,12 +56,12 @@
 
     <section class="sobre-carro">
         <div class="container-sobre">
-            <h2>Uma máquina criada para dominar</h2>
-            <p>
+            <h2 id="titulo1">Uma máquina criada para dominar</h2>
+            <p id="descricao1">
                 O <strong>Naja Striker 57</strong> não é apenas um carro. Ele é uma afirmação. Com um design agressivo,
                 engenharia de precisão e alma esportiva, ele entrega o equilíbrio perfeito entre performance e presença.
             </p>
-            <p>
+            <p id="descricao2">
                 Cada curva do seu chassi é moldada com propósito. Cada detalhe do seu interior foi desenhado
                 para elevar o padrão. Seja na estrada, na cidade ou no seu imaginário, o Striker 57 nasceu para marcar território.
             </p>
@@ -74,7 +74,7 @@
             <tr><th>Motor</th><td id="motor-ficha"></td></tr>
             <tr><th>Potência</th><td id="potencia-ficha"> cv</td></tr>
             <tr><th>Câmbio</th><td id="cambio"></td></tr>
-            <tr><th>Torque</th><td id="torque"> kgfm</td></tr>
+            <tr><th>Torque</th><td id="torque"> </td></tr>
             <tr><th>Tração</th><td id="tracao"></td></tr>
             <tr><th>Consumo Médio</th><td id="consumo"> km/l</td></tr>
         </table>
@@ -82,9 +82,9 @@
 
     <section class="cta-compra">
         <div class="container-cta">
-             <h2>Pronto para ter o seu Naja Striker 57?</h2>
-             <p>Adquira agora mesmo o superesportivo que redefine o seu conceito de liberdade.</p>
-             <a href="#" target="_blank" class="btn-compra">
+             <h2 id="titulo2">Pronto para ter o seu Naja Striker 57?</h2>
+             <p id="descricao3">Adquira agora mesmo o superesportivo que redefine o seu conceito de liberdade.</p>
+             <a href="/pedidos.html" target="_blank" class="btn-compra">
              <i class="fa-solid fa-car"></i> Comprar Agora
              </a>
         </div>
@@ -99,6 +99,8 @@
 
     <script>
         const id = new URLSearchParams(window.location.search).get("id");
+        const images = document.querySelector('.images');
+        let index = 0;  
 
         fetch(`/api/carros/${id}`)
         .then(res => res.json())
@@ -114,41 +116,43 @@
             document.getElementById('tracao').textContent = data.tracao;
             document.getElementById('torque').textContent = data.torque + " kgmf";
             document.getElementById('consumo').textContent = data.consumo + " km/l";
+            document.getElementById('descricao1').innerHTML = data.descricao1.replace('{modelo}', `<strong>${data.modelo}</strong>`);
+            document.getElementById('descricao2').textContent = data.descricao2;
+            document.getElementById('descricao3').textContent = data.descricao3;
+            document.getElementById('titulo1').textContent = data.titulo1;
+            document.getElementById('titulo2').textContent = data.titulo2;
 
+            // Carrossel de imagens
+            if (id === "1") {
+                images.innerHTML = `
+                    <img src="./IMG/Striker 4.png" alt="Imagem 1">
+                    <img src="./IMG/Striker 5.png" alt="Imagem 2">
+                    <img src="./IMG/Striker 6.png" alt="Imagem 3">
+                `;
+            } else if (id === "2") {
+                images.innerHTML = `
+                    <img src="./IMG/Viper 4.png" alt="Imagem 1">
+                    <img src="./IMG/Viper 5.png" alt="Imagem 2">
+                    <img src="./IMG/Viper 6.png" alt="Imagem 3">
+                `;
+            } else if (id === "3") {
+                images.innerHTML = `
+                    <img src="./IMG/Titan 4.png" alt="Imagem 1">
+                    <img src="./IMG/Titan 5.png" alt="Imagem 2">
+                    <img src="./IMG/Titan 6.png" alt="Imagem 3">
+                `;
+            } else {
+                // Para ids maiores que 3, mostra a imagem dinâmica da API
+                if (data.imagem) {
+                    images.innerHTML = `<img src="${data.imagem}" alt="Imagem do carro">`;
+                } else {
+                    images.innerHTML = `<img src="./IMG/default.png" alt="Imagem padrão">`;
+                }
+            }
+
+            index = 0;
+            updateCarousel();
         });
-
-        const images = document.querySelector('.images');
-        let index = 0;
-
-
-
-        // Insere as imagens dinamicamente conforme o id
-        if (id === "1") {
-            images.innerHTML = `
-                <img src="./IMG/Striker 4.png" alt="Imagem 1">
-                <img src="./IMG/Striker 5.png" alt="Imagem 2">
-                <img src="./IMG/Striker 6.png" alt="Imagem 3">
-            `;
-        } else if (id === "2") {
-            images.innerHTML = `
-                <img src="./IMG/Viper 4.png" alt="Imagem 1">
-                <img src="./IMG/Viper 5.png" alt="Imagem 2">
-                <img src="./IMG/Viper 6.png" alt="Imagem 3">
-            `;
-        } else if (id === "3") {
-            images.innerHTML = `
-                <img src="./IMG/Titan 4.png" alt="Imagem 1">
-                <img src="./IMG/Titan 5.png" alt="Imagem 2">
-                <img src="./IMG/Titan 6.png" alt="Imagem 3">
-            `;
-        } else {
-            images.innerHTML = `
-                <img src="./IMG/default.png" alt="Imagem padrão">
-            `;
-        }
-
-        // Agora que as imagens estão no DOM, calcular a quantidade
-        const imgCount = document.querySelectorAll('.images img').length;
 
         // Função para atualizar o carrossel
         function updateCarousel() {
@@ -158,11 +162,13 @@
 
         // Event listeners para os botões
         document.querySelector('.next').addEventListener('click', () => {
+            const imgCount = document.querySelectorAll('.images img').length;
             index = (index + 1) % imgCount;
             updateCarousel();
         });
 
         document.querySelector('.prev').addEventListener('click', () => {
+            const imgCount = document.querySelectorAll('.images img').length;
             index = (index - 1 + imgCount) % imgCount;
             updateCarousel();
         });
@@ -172,6 +178,7 @@
 
         // Atualiza o carrossel para a posição inicial
         updateCarousel();
+
 
     </script>
 </body>

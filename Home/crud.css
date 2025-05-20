@@ -136,6 +136,59 @@ button.cadastrar:hover {
     border-color: #911924;
 }
 
+.btn {
+    display: inline-block;
+    padding: 20px 40px;
+    background-color: #911924;
+    color: #ffffff;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+.btn:hover {
+    background-color: #6d131a;
+    transform: scale(1.1);
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    gap: 120px;
+    margin-left: 250px;
+}
+
+.nav-list li {
+    letter-spacing: 1px;
+    transition: 0.3 ease;
+}
+
+li:hover a { 
+    transform: scale(1.10);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #911924;
+    height: 10vh;
+    padding: 0 35px;
+    position: relative;
+}
+a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 400;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    display: inline-block;
+}
 
 
 /* RESPONSIVIDADE */

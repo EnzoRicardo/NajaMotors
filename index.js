@@ -146,7 +146,7 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
     console.log('File:', req.file);
 
 
-    const { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+    const { ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
 
     const imagemBuffer = req.file ? req.file.buffer : null;
 
@@ -154,8 +154,8 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
         console.log("Nenhuma imagem foi enviada.");
     }
 
-    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(insert, [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer], (err) => {
+    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(insert, [ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer], (err) => {
         if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
         res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
     });
@@ -165,49 +165,43 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
 // API Atualizar Carro
 
 app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
-    const { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+    const { ano, preco, modelo, texto, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
     const id = req.params.id;
     const imagemBuffer = req.file ? req.file.buffer : null;
 
-    const buscaModelo = 'SELECT id FROM Modelo WHERE nome = ? LIMIT 1';
-    
-    db.query(buscaModelo, [modelo], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(400).json({ message: 'Modelo não encontrado.' });
+    const modelo_id = modelo; // já é o ID enviado pelo front-end
+    const texto_id = texto;
+
+    let updateQuery;
+    let params;
+
+    if (imagemBuffer) {
+        updateQuery = `
+            UPDATE Carro 
+            SET ano = ?, preco = ?, modelo_id = ?, texto_id = ?, velocidademax = ?, aceleracao = ?, 
+                motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
+                consumo = ?, imagem = ?
+            WHERE id = ?`;
+        params = [ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id];
+    } else {
+        updateQuery = `
+            UPDATE Carro 
+            SET ano = ?, preco = ?, modelo_id = ?, texto_id = ?, velocidademax = ?, aceleracao = ?, 
+                motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
+                consumo = ?
+            WHERE id = ?`;
+        params = [ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id];
+    }
+
+    db.query(updateQuery, params, (err) => {
+        if (err) {
+            console.error('Erro ao atualizar carro:', err);
+            return res.status(500).json({ message: 'Erro ao atualizar carro.' });
         }
-
-        const modelo_id = results[0].id;
-
-        let updateQuery;
-        let params;
-
-        if (imagemBuffer) {
-            updateQuery = `
-                UPDATE Carro 
-                SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, 
-                    motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
-                    consumo = ?, imagem = ?
-                WHERE id = ?`;
-            params = [ano, preco, modelo_id ,velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id];
-        } else {
-            updateQuery = `
-                UPDATE Carro 
-                SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, 
-                    motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
-                    consumo = ?
-                WHERE id = ?`;
-            params = [ano, preco, modelo_id ,velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id];
-        }
-
-        db.query(updateQuery, params, (err) => {
-            if (err) {
-                console.error('Erro ao atualizar carro:', err);
-                return res.status(500).json({ message: 'Erro ao atualizar carro.' });
-            }
-            res.status(200).json({ message: 'Carro atualizado com sucesso!' });
-        });
+        res.status(200).json({ message: 'Carro atualizado com sucesso!' });
     });
 });
+
 
 
 // API Deletar Carro
@@ -225,14 +219,17 @@ app.get('/api/carro', (req, res) => {
     const sql = `
     SELECT 
         Carro.id AS id,
+        Texto.id AS texto_id,
         Marca.nome AS marca,
         Modelo.nome AS modelo,
         Carro.ano,
         preco,
-        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
+        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem,
+        Texto.descricao1 AS descricao1
     FROM Carro
     JOIN Modelo ON Carro.modelo_id = Modelo.id
-    JOIN Marca ON Modelo.marca_id = Marca.id;
+    JOIN Marca ON Modelo.marca_id = Marca.id
+    JOIN Texto on Carro.texto_id = Texto.id;
     `;
 
     db.query(sql, (err, results) => {
@@ -253,10 +250,12 @@ app.get('/api/carros/:id', (req, res) => {
         Modelo.nome AS modelo,
         Carro.ano,
         preco,
-        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo
+        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo,
+        Texto.descricao1, Texto.descricao2, Texto.descricao3, Texto.titulo1, Texto.titulo2
     FROM Carro
     JOIN Modelo ON Carro.modelo_id = Modelo.id
     JOIN Marca ON Modelo.marca_id = Marca.id
+    JOIN Texto ON Carro.texto_id = Texto.id
     WHERE Carro.id = ?;
     `;
 
@@ -266,6 +265,41 @@ app.get('/api/carros/:id', (req, res) => {
         res.status(200).json(results[0]);
     });
 });
+
+
+// API Listar todos os carros (nome, preço e imagem base64)
+
+app.get('/api/carros', (req, res) => {
+    const sql = `
+        SELECT 
+            Carro.id,
+            Modelo.nome AS nome,
+            Carro.preco,
+            Carro.imagem
+        FROM Carro
+        JOIN Modelo ON Carro.modelo_id = Modelo.id;
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar carros:', err);
+            return res.status(500).json({ message: 'Erro ao buscar carros.' });
+        }
+
+        const carros = results.map(carro => ({
+            id: carro.id,
+            nome: carro.nome,
+            preco: carro.preco,
+            imagem: carro.imagem 
+                ? `data:image/jpeg;base64,${carro.imagem.toString('base64')}` 
+                : null
+        }));
+
+        res.status(200).json(carros);
+    });
+});
+
+
 
 
 // API listar marcas
@@ -399,7 +433,7 @@ app.put('/api/modelo/:id', (req, res) => {
     });
 });
 
-// API Deletar Modelo -- PRECISA ARRUMAR
+// API Deletar Modelo
 app.delete('/api/modelo/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM Modelo WHERE id = ?', [id], (err, results) => {
@@ -416,7 +450,63 @@ function authMiddleware(req, res, next) {
     }
 }
 
+// API listar Texto
+app.get('/api/texto', (req, res) => {
+    const sql = `
+    SELECT * FROM Texto;
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao buscar textos.' });
+        res.status(200).json(results);
+    });
+});
+
+
+// API Cadastrar Texto
+
+// Criar novo Texto
+app.post('/api/cadastrarT', (req, res) => {
+    const { descricao1, descricao2, descricao3, titulo1, titulo2 } = req.body;
+
+    // Validação simples
+    if (!descricao1 || !descricao2 || !descricao3 || !titulo1 || !titulo2) {
+        return res.status(400).json({ message: 'Campos obrigatórios.' });
+    }
+
+    const sql = 'INSERT INTO Texto (descricao1, descricao2, descricao3, titulo1, titulo2)  VALUES (?, ?, ?, ?, ?)';
+
+    db.query(sql, [descricao1, descricao2, descricao3, titulo1, titulo2], (err, result) => {
+        if (err) {
+            console.error('Erro ao inserir textos:', err);
+            return res.status(500).json({ message: 'Erro ao criar texto.' });
+        }
+
+        res.status(201).json({ 
+            message: 'Texto criado com sucesso!',
+            id: result.insertId 
+        });
+    });
+});
+
+
+// API Update de Texto
+app.put('/api/texto/:id', (req, res) => {
+    const { id } = req.params;
+    const { titulo1, titulo2, descricao1, descricao2, descricao3 } = req.body;
+
+    db.query('UPDATE Texto SET titulo1 = ?, titulo2 = ?, descricao1 = ?, descricao2 = ?, descricao3 = ? WHERE id = ?', [titulo1, titulo2, descricao1, descricao2, descricao3, id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao atualizar texto.' });
+        res.status(200).json({ message: 'Texto atualizado com sucesso!' });
+    });
+});
+
+
+
+
 const path = require('path');
+
+// API Middleware para barrar usuário não autenticado e não admin
 
 app.get('/crud', authMiddleware, adminMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'home', 'crud.html'));
