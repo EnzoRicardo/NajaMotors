@@ -162,4 +162,31 @@ header {
         padding: 0 15px;
         justify-content: center;
     }
+
+    .cart-container {
+    flex-direction: column;
+    height: auto;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .car-photo img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ver-btn, .comprar-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .info-item input {
+    width: 100%;
+  }
 }
