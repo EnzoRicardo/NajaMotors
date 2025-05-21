@@ -32,7 +32,7 @@ const db = mysql.createConnection({
     database: 'najamotors'
 });
 // 
-
+// 
 
 // API Cadastro de usuário
 app.post('/api/cadastrarU', async (req, res) => {
