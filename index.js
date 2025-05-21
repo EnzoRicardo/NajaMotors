@@ -31,8 +31,7 @@ const db = mysql.createConnection({
     password: 'PUC@1234',
     database: 'najamotors'
 });
-
-
+// 
 
 
 // API Cadastro de usuário
