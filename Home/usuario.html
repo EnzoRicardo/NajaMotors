@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuario NM</title>
+    <link rel="stylesheet" href="usuario.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="logo" href="./index.html"> <img src="./IMG/Logo NM.png" alt="NM"> </a>
+        </nav>
+    </header>
+
+    <section class="user">
+        <div class="user-container">
+
+            <div class="user-photo">
+                <img src="image/foto-usuario.png" alt="Foto do usuário">
+                <label for="upload-photo" class="upload-btn">Trocar Foto</label>
+                <input type="file" id="upload-photo" hidden>
+            </div>
+
+            <div class="user-info">
+                
+                <h2>Informações do Usuário</h2>
+
+                <div class="info-item">
+                    <strong>Nome:</strong>
+                    <input type="text" value="João Silva">
+                </div>
+
+                <div class="info-item">
+                    <strong>Email:</strong>
+                    <input type="email" value="joao@email.com">
+                </div>
+
+                <div class="info-item">
+                    <strong>Telefone:</strong>
+                    <input type="tel" value="(11) 98765-4321">
+                </div>
+
+                <div class="info-item">
+                    <strong>Endereço:</strong>
+                    <input type="text" value="Rua das Flores, 123 - SP">
+                </div>
+
+                <div class="info-item">
+                    <strong>Senha Atual:</strong>
+                    <input type="password" placeholder="Digite sua senha atual">
+                </div>
+
+                <div class="info-item">
+                    <strong>Nova Senha:</strong>
+                    <input type="password" placeholder="Digite sua nova senha">
+                </div>
+
+            </div>
+
+            <button class="save-button">Salvar Alterações</button>
+
+        </div>
+    </section>
+
+
+</body>
+</html>
