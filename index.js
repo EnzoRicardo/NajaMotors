@@ -28,7 +28,7 @@ app.use(session({
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'PUC@1234',
+    password: '',
     database: 'najamotors'
 });
 // 
@@ -376,6 +376,10 @@ app.put('/api/marca/:id', (req, res) => {
 app.post('/api/cadastrarM', (req, res) => {
     const { nome } = req.body;
 
+    if (!nome) {
+        return res.status(400).json({ message: 'Os campos são obrigatórios.' });
+    }
+
     const insert = 'INSERT INTO Marca (nome) VALUES (?)';
     db.query(insert, [nome], (err) => {
         if (err) {
@@ -568,4 +572,99 @@ app.get('/crud', authMiddleware, adminMiddleware, (req, res) => {
 const port = 3000;
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+});
+
+
+app.post('/api/pedidos', (req, res) => {
+    const { usuario_id, carro_id } = req.body;
+
+    db.query(`INSERT INTO Pedido (usuario_id) VALUES (?)`, [usuario_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao inserir pedido:', err);
+            return res.status(500).json({ error: 'Erro ao criar pedido' });
+        }
+
+        const pedidoId = result.insertId;
+
+        db.query(`INSERT INTO Pedido_Carro (pedido_id, carro_id) VALUES (?, ?)`, [pedidoId, carro_id], (err2) => {
+            if (err2) {
+                console.error('Erro ao inserir pedido_carro:', err2);
+                return res.status(500).json({ error: 'Erro ao associar carro ao pedido' });
+            }
+
+            res.status(201).json({ message: 'Pedido criado com sucesso', pedidoId });
+        });
+    });
+});
+
+
+
+app.delete('/api/pedidos/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.query('DELETE FROM Pedido WHERE id = ?', [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar pedido:', err);
+            return res.status(500).json({ error: 'Erro ao cancelar pedido' });
+        }
+
+        res.json({ message: 'Pedido cancelado com sucesso' });
+    });
+});
+
+
+app.get('/api/pedidos/usuario/:id', (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT Pedido.id AS pedido_id, Modelo.nome AS modelo, Marca.nome AS marca, Carro.imagem
+    FROM Pedido
+    JOIN Pedido_Carro ON Pedido.id = Pedido_Carro.pedido_id
+    JOIN Carro ON Pedido_Carro.carro_id = Carro.id
+    JOIN Modelo ON Carro.modelo_id = Modelo.id
+    JOIN Marca ON Modelo.marca_id = Marca.id
+    WHERE Pedido.usuario_id = ?
+  `;
+
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar pedidos:', err);
+      return res.status(500).json({ error: 'Erro ao buscar pedidos' });
+    }
+
+    const pedidosFormatados = results.map(pedido => ({
+      pedido_id: pedido.pedido_id,
+      nome: `${pedido.marca} ${pedido.modelo}`,
+      imagem: pedido.imagem
+        ? `data:image/jpeg;base64,${pedido.imagem.toString('base64')}`
+        : null
+    }));
+
+    res.json(pedidosFormatados);
+  });
+});
+
+
+// API listar Carro
+app.get('/api/pedido', (req, res) => {
+    const sql = `
+    SELECT 
+        Pedido.id AS pedido_id,
+        Usuario.nome AS usuario,
+        Marca.nome AS marca,
+        Modelo.nome AS modelo
+    FROM Pedido
+    JOIN Usuario ON Pedido.usuario_id = Usuario.id
+    JOIN Pedido_Carro ON Pedido.id = Pedido_Carro.pedido_id
+    JOIN Carro ON Pedido_Carro.carro_id = Carro.id
+    JOIN Modelo ON Carro.modelo_id = Modelo.id
+    JOIN Marca ON Modelo.marca_id = Marca.id;
+
+
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao buscar pedidos.' });
+        res.status(200).json(results);
+    });
 });

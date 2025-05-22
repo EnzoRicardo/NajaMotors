@@ -1,264 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naja Motors</title>
-    <link rel="stylesheet" href="pedidos.css">
-    <link rel="icon" href="./IMG/Logo NM.png" type="image/x-icon">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
-    <script src="rotas.js">"/rotas.js"</script>
-
-
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de Carros</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .carros-container, .cards-pedidos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .card, .card-pedido {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      width: 200px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card img, .card-pedido img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    .btn-comprar, .btn-cancelar {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-comprar {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-cancelar {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="nav-left">
-                <a class="logo" href="/"> <img src="IMG/Logo NM.png" alt="NM" class="logo-image"> </a>
-            </div>
+  <h1>Lista de Carros</h1>
+  <div class="carros-container" id="carros"></div>
 
-            <div class="menu-toggle" id="mobile-menu">
-              ☰
-            </div>
+  <div class="pedido-container" id="pedidos"></div>
 
-            
-            <ul class="nav-list" id="nav-list">
-                <li><a href="#about">Sobre</a></li>
-                <li><a href="#models">Modelos</a></li>
-                <li id="crud-item" style="display: none;"><a href="#" onclick="crud()">CRUD</a></li>
-                <li><a href="#">Fale Conosco</a></li>
-                <li><a id="nomeUsuario"></a></li>
-                <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
-            </ul>
-            
-            <div class="nav-right">
-                <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
-                <a href="./Login/login.html" class="login-btn" id="logout-btn" onclick="logout()">Logout</a>
-            </div>
-        </nav>
-    </header>
-
-
-    <div class="divider"></div>
-
-    <main class="pedido-container">
-        <h2>Buscar Pedido</h2>
-        <input type="text" id="buscaCarro" placeholder="Digite o nome do carro..." />
-
-        <div id="lista-carros" class="carros-container">
-            <!-- Carros aparecerão aqui -->
-        </div>
-    </main>
-
-
-    <button id="backToTop">⬆</button>
-
-    <script src="script.js"></script>
-    <script>
-      const menuToggle = document.getElementById('mobile-menu');
-      const navList = document.getElementById('nav-list');
-  
-      menuToggle.addEventListener('click', () => {
-          navList.classList.toggle('active');
-      });
-
-      document.querySelectorAll('#nav-list a').forEach(link => {
-          link.addEventListener('click', () => {
-              navList.classList.remove('active');
-          });
-      });
-  
-      // Unificação do carregamento e controle de login/logout
-      window.onload = async () => {
-          try {
-              const res = await fetch('http://localhost:3000/api/usuario', {
-                  credentials: 'include'
-              });
-  
-              const loginBtn = document.getElementById('login-btn');
-              const logoutBtn = document.getElementById('logout-btn');
-              const loginItem = document.getElementById('login-item');
-  
-              if (res.ok) {
-                  const data = await res.json();
-                  const nome = data.usuario.name;
-                  const funcao = data.usuario.funcao;
-                  
-                  document.getElementById('nomeUsuario').innerText = `${funcao}: ${nome}`;
-                  
-  
-                  // Mostrar apenas Logout
-                  if (loginBtn) loginBtn.style.display = 'none';
-                  if (logoutBtn) logoutBtn.style.display = 'inline-block';
-                  if (loginItem) {
-                      loginItem.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
-                  }
-              } else {
-                  // Mostrar apenas Login
-                  if (loginBtn) loginBtn.style.display = 'inline-block';
-                  if (logoutBtn) logoutBtn.style.display = 'none';
-                  if (loginItem) {
-                      loginItem.innerHTML = `<a href="./Login/login.html">Login</a>`;
-                  }
-              }
-          } catch (error) {
-              console.error('Erro ao buscar usuário:', error);
-              // Fallback: mostra apenas login
-              if (document.getElementById('login-btn')) document.getElementById('login-btn').style.display = 'inline-block';
-              if (document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
-              if (document.getElementById('login-item')) {
-                  document.getElementById('login-item').innerHTML = `<a href="./Login/login.html">Login</a>`;
-              }
-          }
-      };
-  
-      async function logout() {
-          const res = await fetch('http://localhost:3000/api/logout', {
-              method: 'POST',
-              credentials: 'include'
-          });
-  
-          if (res.ok) {
-              window.location.href = './Login/login.html';
-          } else {
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Erro',
-                  text: 'Falha ao fazer logout.'
-              });
-          }
-      }
-
-  
-    let carrosCache = []; // variável global para guardar os carros já carregados
-
-async function carregarCarros() {
-    try {
-        const res = await fetch('http://localhost:3000/api/carros');
-        const carros = await res.json();
-
-        carrosCache = carros; // guarda os carros
-
-        mostrarCarros(carros);
-    } catch (error) {
-        console.error('Erro ao carregar carros:', error);
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    async function buscarUsuarioLogado() {
+      const res = await fetch('http://localhost:3000/api/usuario', { credentials: 'include' });
+      if (!res.ok) throw new Error("Usuário não autenticado");
+      const data = await res.json();
+      return data.usuario;
     }
-}
 
-function mostrarCarros(carros) {
-        const lista = document.getElementById('lista-carros');
-        lista.innerHTML = ''; // limpa a lista
+    async function carregarCarros() {
+      const container = document.getElementById('carros');
+      const res = await fetch('http://localhost:3000/api/carros');
+      const carros = await res.json();
 
-        carros.forEach(carro => {
-            const item = document.createElement('div');
-            item.classList.add('carro-item');
+      container.innerHTML = '';
+      carros.forEach(carro => {
+        container.innerHTML += `
+          <div class="card">
+            <img src="${carro.imagem}" alt="${carro.nome}">
+            <h3>${carro.nome}</h3>
+            <button class="btn-comprar" onclick="criarPedido(${carro.id})">Comprar</button>
+          </div>
+        `;
+      });
+    }
 
-            item.innerHTML = `
-                <img src="${carro.imagem}" alt="${carro.nome}">
-                <div class="carro-info">
-                    <h3>${carro.nome}</h3>
-                    <p>Preço: R$ ${parseFloat(carro.preco).toFixed(2)}</p>
-                </div>
-                <button class="btn-visualizar" onclick="window.location.href='striker.html?id=${carro.id}'">Ver carro</button>
-                <button class="btn-comprar">Comprar</button>
-            `;
+    async function criarPedido(carro_id) {
+      try {
+        const usuario = await buscarUsuarioLogado();
 
-
-            lista.appendChild(item);
+        const res = await fetch('http://localhost:3000/api/pedidos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario_id: usuario.id, carro_id })
         });
-    }
 
-    // Função para filtrar carros pelo nome
-    function filtrarCarros() {
-        const texto = document.getElementById('buscaCarro').value.toLowerCase();
+        if (!res.ok) throw new Error("Erro ao criar pedido");
 
-        // filtra carros que contenham o texto digitado no nome
-        const filtrados = carrosCache.filter(carro => carro.nome.toLowerCase().includes(texto));
-
-        mostrarCarros(filtrados);
-    }
-
-    // Evento para capturar a digitação no input
-    document.getElementById('buscaCarro').addEventListener('input', filtrarCarros);
-
-    // Carrega os carros na inicialização
-    carregarCarros();
-
-    window.onload = async () => {
-          try {
-              const res = await fetch('http://localhost:3000/api/usuario', {
-                  credentials: 'include'
-              });
-  
-              const loginBtn = document.getElementById('login-btn');
-              const logoutBtn = document.getElementById('logout-btn');
-              const loginItem = document.getElementById('login-item');
-  
-              if (res.ok) {
-                  const data = await res.json();
-                  const nome = data.usuario.name;
-                  const crudItem = document.getElementById('crud-item');
-                  const funcao = data.usuario.funcao;
-                  const pedidosItem = document.getElementById('pedidos-item');
-                  
-                  document.getElementById('nomeUsuario').innerText = `${funcao}: ${nome}`;
-                  
-  
-                  // Mostrar apenas Logout
-                  if (loginBtn) loginBtn.style.display = 'none';
-                  if (logoutBtn) logoutBtn.style.display = 'inline-block';
-                  if (loginItem) {
-                      loginItem.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
-                  }
-                  // MOSTRAR CRUD APENAS PARA ADMIN
-                  if (funcao === 'admin' && crudItem) {
-                        crudItem.style.display = 'list-item'; // Ou 'inline-block' dependendo do estilo do seu nav
-                   }
-                  if (funcao === 'user' && pedidosItem) {
-                        pedidosItem.style.display = 'list-item';
-                    }
-        
-              } else {
-                  // Mostrar apenas Login
-                  if (loginBtn) loginBtn.style.display = 'inline-block';
-                  if (logoutBtn) logoutBtn.style.display = 'none';
-                  if (loginItem) {
-                      loginItem.innerHTML = `<a href="./Login/login.html">Login</a>`;
-                  }
-              }
-          } catch (error) {
-              console.error('Erro ao buscar usuário:', error);
-              // Fallback: mostra apenas login
-              if (document.getElementById('login-btn')) document.getElementById('login-btn').style.display = 'inline-block';
-              if (document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
-              if (document.getElementById('login-item')) {
-                  document.getElementById('login-item').innerHTML = `<a href="./Login/login.html">Login</a>`;
-              }
-          }
-      };
-  
-      async function logout() {
-          const res = await fetch('http://localhost:3000/api/logout', {
-              method: 'POST',
-              credentials: 'include'
-          });
-  
-          if (res.ok) {
-              window.location.href = './Login/login.html';
-          } else {
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Erro',
-                  text: 'Falha ao fazer logout.'
-              });
-          }
+        Swal.fire("Pedido criado com sucesso!", "", "success");
+        carregarPedidos();
+      } catch (error) {
+        Swal.fire("Erro", error.message, "error");
       }
+    }
 
+    async function carregarPedidos() {
+      try {
+        const usuario = await buscarUsuarioLogado();
+
+        const res = await fetch(`http://localhost:3000/api/pedidos/usuario/${usuario.id}`);
+        const pedidos = await res.json();
+
+        const container = document.getElementById('pedidos');
+        container.innerHTML = '<h2>Meus Pedidos</h2><div class="cards-pedidos" id="cardsPedidos"></div>';
+        const cards = document.getElementById('cardsPedidos');
+
+        pedidos.forEach(pedido => {
+          cards.innerHTML += `
+            <div class="card-pedido">
+              <img src="${pedido.imagem}" alt="${pedido.nome}">
+              <h3>${pedido.nome}</h3>
+              <button class="btn-cancelar" onclick="cancelarPedido(${pedido.pedido_id})">Cancelar</button>
+            </div>
+          `;
+        });
+      } catch (error) {
+        console.error('Erro ao carregar pedidos:', error);
+      }
+    }
+
+    async function cancelarPedido(id) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/pedidos/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error("Erro ao cancelar pedido");
+        Swal.fire("Pedido cancelado!", "", "success");
+        carregarPedidos();
+      } catch (error) {
+        Swal.fire("Erro", error.message, "error");
+      }
+    }
+
+    // Inicialização
+    carregarCarros();
+    carregarPedidos();
   </script>
-  
-      
 </body>
 </html>
