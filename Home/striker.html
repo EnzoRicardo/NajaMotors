@@ -144,9 +144,9 @@
             } else {
                 // Para ids maiores que 3, mostra a imagem dinâmica da API
                 if (data.imagem) {
-                    images.innerHTML = `<img src="${data.imagem}" alt="Imagem do carro">`;
+                    images.innerHTML = `<img src="http://localhost:3000/api/imagem/${id}" alt="Imagem do usuário">`;
                 } else {
-                    images.innerHTML = `<img src="./IMG/default.png" alt="Imagem padrão">`;
+                    images.innerHTML = `<img src="http://localhost:3000/api/imagem/${id}" alt="Imagem do usuário">`;
                 }
             }
 

@@ -28,7 +28,7 @@ app.use(session({
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'PUC@1234',
+    password: '',
     database: 'najamotors'
 });
 // 
@@ -263,6 +263,25 @@ app.get('/api/carros/:id', (req, res) => {
         if (results.length === 0) return res.status(404).json({ message: 'Carro não encontrado.' });
         res.status(200).json(results[0]);
     });
+});
+
+
+// Rota para servir imagem por ID
+app.get('/api/imagem/:id', (req, res) => {
+  const id = req.params.id;
+  const query = 'SELECT imagem FROM carro WHERE id = ?';
+
+  db.query(query, [id], (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(404).send('Imagem não encontrada');
+    }
+
+    const imagem = results[0].imagem;
+    const tipo = results[0].FotoMimeType || 'image/jpeg'; // mime padrão caso não tenha
+
+    res.setHeader('Content-Type', tipo);
+    res.send(imagem);
+  });
 });
 
 
