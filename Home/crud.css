@@ -233,6 +233,7 @@ button.cadastrar:hover {
 
 @media (max-width: 768px) {
     .logo {
+        top: 40%;
         left: 50%;
         transform: translateX(-50%);
         position: relative;
@@ -258,6 +259,30 @@ button.cadastrar:hover {
 
     .crud-container h2 {
         font-size: 1.5rem;
+    }
+
+    .nav-list {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+        margin-left: -220px;
+        font-size: 12px;
+    }
+
+     table {
+        min-width: 100%;
+        width: 100%;
+        font-size: 12px; /* fonte menor */
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .crud-container {
+        padding: 10px;
     }
 }
 
