@@ -24,8 +24,9 @@
             <ul class="nav-list" id="nav-list">
                 <li><a href="#about">Sobre</a></li>
                 <li><a href="#models">Modelos</a></li>
-                <li id="crud-item" style="display: none;"><a href="#" onclick="crud()">CRUD</a></li>
+                <li id="crud-item" style="display: none;"><a href="/crud.html">CRUD</a></li>
                 <li><a href="#">Fale Conosco</a></li>
+                <li><a href="/pedidos.html">Pedidos</a></li>
                 <li><a id="nomeUsuario"></a></li>
                 <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
             </ul>
@@ -235,11 +236,25 @@
         });
 
         async function buscarUsuarioLogado() {
-        const res = await fetch('http://localhost:3000/api/usuario', { credentials: 'include' });
-        if (!res.ok) throw new Error("Usuário não autenticado");
-        const data = await res.json();
-        return data.usuario;
+        try {
+            const res = await fetch('http://localhost:3000/api/usuario', { credentials: 'include' });
+            
+            if (!res.ok) {
+                // Redireciona para o login se a resposta não for OK (ex: 401)
+                window.location.href = '/login/login.html'; // ajuste conforme o nome real da sua página
+                return;
+            }
+
+            const data = await res.json();
+            return data.usuario;
+            
+        } catch (error) {
+            // Se houver erro de rede ou qualquer outra exceção
+            console.error('Erro ao buscar usuário logado:', error);
+            window.location.href = '/login/login.html';
         }
+    }
+
 
         async function criarPedido(carro_id) {
         try {

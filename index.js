@@ -8,6 +8,7 @@ const { message } = require('statuses');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
+const sharp = require('sharp');
 
 
 app.use(cors());
@@ -33,28 +34,33 @@ const db = mysql.createConnection({
 // 
 // 
 
-// API Cadastro de usuário
-app.post('/api/cadastrarU', async (req, res) => {
+app.post('/api/cadastrarU', upload.single('imagem'), async (req, res) => {
     const { nome, email, cpf, senha } = req.body;
+    const imagem = req.file?.buffer;
 
-    if (!nome || !email || !cpf  || !senha) {
-        return res.status(400).json({ message: 'Os campos são obrigatórios.' });
+    if (!nome || !email || !cpf || !senha) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
     }
 
-    const hashpass = await bcrypt.hash(senha, 10);
-    const q = `INSERT INTO usuario (nome, email, cpf, senha) VALUES (?, ?, ?, ?)`
-    
-    db.query(q, [nome,email,cpf,hashpass], (err,data) => {
-        if (err){
-            if (err.code === 'ER_DUP_ENTRY') {
-                return res.status(409).json({ message: 'Email ou CPF ja cadastrados.'});
+    try {
+        const hashpass = await bcrypt.hash(senha, 10);
+        const q = `INSERT INTO usuario (nome, email, cpf, senha, imagem) VALUES (?, ?, ?, ?, ?)`;
+
+        db.query(q, [nome, email, cpf, hashpass, imagem], (err, data) => {
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(409).json({ message: 'Email ou CPF já cadastrados.' });
+                }
+                return res.status(500).json(err);
             }
-            return res.json(err)
-        } 
-            
-        return res.json("Usuário registrado.")
-    });
+
+            return res.status(201).json({ message: 'Usuário registrado.' });
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Erro no servidor', error });
+    }
 });
+
 
 
 // API Update de usuário
@@ -143,34 +149,68 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
     console.log('Body:', req.body);
     console.log('File:', req.file);
 
+    const {
+        ano, preco, modelo_id, velocidademax, aceleracao, motor,
+        cor, potencia, cambio, torque, tracao, consumo
+    } = req.body;
 
-    const { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+    let imagemBuffer = null;
 
-    const imagemBuffer = req.file ? req.file.buffer : null;
-
-     if (!req.file) {
+    if (req.file) {
+        try {
+            imagemBuffer = await sharp(req.file.buffer)
+                .resize(800, 600) // Redimensiona proporcionalmente
+                .jpeg({ quality: 70 }) // Comprime a imagem
+                .toBuffer();
+        } catch (err) {
+            console.error('Erro ao processar a imagem:', err);
+            return res.status(500).json({ message: 'Erro ao processar a imagem.' });
+        }
+    } else {
         console.log("Nenhuma imagem foi enviada.");
     }
 
-    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(insert, [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer], (err) => {
+    const insert = `
+        INSERT INTO Carro 
+        (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    db.query(insert, [
+        ano, preco, modelo_id, velocidademax, aceleracao, motor,
+        cor, potencia, cambio, torque, tracao, consumo, imagemBuffer
+    ], (err) => {
         if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
         res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
     });
 });
 
 
+
 // API Atualizar Carro
 
 app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
-    const { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+    const {
+        ano, preco, modelo, velocidademax, aceleracao, motor,
+        cor, potencia, cambio, torque, tracao, consumo
+    } = req.body;
     const id = req.params.id;
-    const imagemBuffer = req.file ? req.file.buffer : null;
+    const modelo_id = modelo;
 
-    const modelo_id = modelo; // já é o ID enviado pelo front-end
+    let imagemBuffer = null;
 
-    let updateQuery;
-    let params;
+    if (req.file) {
+        try {
+            imagemBuffer = await sharp(req.file.buffer)
+                .resize(800, 600)
+                .jpeg({ quality: 70 })
+                .toBuffer();
+        } catch (err) {
+            console.error('Erro ao processar a imagem:', err);
+            return res.status(500).json({ message: 'Erro ao processar a imagem.' });
+        }
+    }
+
+    let updateQuery, params;
 
     if (imagemBuffer) {
         updateQuery = `
@@ -179,7 +219,10 @@ app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
                 motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
                 consumo = ?, imagem = ?
             WHERE id = ?`;
-        params = [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id];
+        params = [
+            ano, preco, modelo_id, velocidademax, aceleracao, motor,
+            cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id
+        ];
     } else {
         updateQuery = `
             UPDATE Carro 
@@ -187,7 +230,10 @@ app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
                 motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
                 consumo = ?
             WHERE id = ?`;
-        params = [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id];
+        params = [
+            ano, preco, modelo_id, velocidademax, aceleracao, motor,
+            cor, potencia, cambio, torque, tracao, consumo, id
+        ];
     }
 
     db.query(updateQuery, params, (err) => {
@@ -619,13 +665,13 @@ app.get('/api/pedidos/usuario/:id', (req, res) => {
   const { id } = req.params;
 
   const sql = `
-    SELECT Pedido.id AS pedido_id, Modelo.nome AS modelo, Marca.nome AS marca, Carro.imagem
+    SELECT Pedido.id AS pedido_id, Modelo.nome AS modelo, Carro.preco AS preco, Carro.imagem
     FROM Pedido
     JOIN Pedido_Carro ON Pedido.id = Pedido_Carro.pedido_id
     JOIN Carro ON Pedido_Carro.carro_id = Carro.id
     JOIN Modelo ON Carro.modelo_id = Modelo.id
     JOIN Marca ON Modelo.marca_id = Marca.id
-    WHERE Pedido.usuario_id = ?
+    WHERE Pedido.usuario_id = ?;
   `;
 
   db.query(sql, [id], (err, results) => {
@@ -637,6 +683,7 @@ app.get('/api/pedidos/usuario/:id', (req, res) => {
     const pedidosFormatados = results.map(pedido => ({
       pedido_id: pedido.pedido_id,
       nome: `${pedido.modelo}`,
+      preco: pedido.preco,
       imagem: pedido.imagem
         ? `data:image/jpeg;base64,${pedido.imagem.toString('base64')}`
         : null
@@ -679,7 +726,7 @@ app.get('/', (req, res) => {
 
 // Middleware para proteger arquivos específicos
 const arquivosProtegidos = ['/crud.html', '/crudcarro.html', '/crudmarca.html', '/crudmodelo.html', '/crudpedido.html', '/crudtexto.html'];
-const arquivosLogin = ['/pedidos.html'];
+const arquivosLogin = ['/pedidos.html', '/usuario.html'];
 
 app.use((req, res, next) => {
     // Protege rotas que precisam de login e admin
@@ -704,4 +751,91 @@ app.use((req, res, next) => {
 
 // Middleware para servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'Home')));
+
+app.get('/api/usuario/imagem/:id', (req, res) => {
+    const id = req.params.id;
+    db.query('SELECT imagem FROM usuario WHERE id = ?', [id], (err, results) => {
+        if (err || results.length === 0) return res.sendStatus(404);
+        res.setHeader('Content-Type', 'image/jpeg'); // ou 'image/png'
+        res.send(results[0].imagem);
+    });
+});
+
+app.get('/api/usuario2', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: 'Não autenticado' });
+
+    const q = 'SELECT nome, email, imagem FROM usuario WHERE id = ?';
+    db.query(q, [req.session.user.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        const usuario = data[0];
+        const imagemBase64 = usuario.imagem ? usuario.imagem.toString('base64') : null;
+
+        res.json({
+            nome: usuario.nome,
+            email: usuario.email,
+            imagemBase64
+        });
+    });
+});
+
+app.post('/api/usuario/atualizar', upload.single('imagem'), async (req, res) => {
+    const userId = req.session.user?.id;
+    if (!userId) return res.status(401).json({ message: 'Não autorizado.' });
+
+    try {
+        const { nome, senhaAtual, novaSenha } = req.body;
+        let imagemBuffer = null;
+
+        if (req.file) {
+            // Reduz a imagem para 300x300 e comprime em JPEG com 70% de qualidade
+            imagemBuffer = await sharp(req.file.buffer)
+                .resize(300, 300)
+                .jpeg({ quality: 70 })
+                .toBuffer();
+        }
+
+        let query = 'UPDATE usuario SET ';
+        const params = [];
+
+        if (nome) {
+            query += 'nome = ?, ';
+            params.push(nome);
+        }
+
+        if (imagemBuffer) {
+            query += 'imagem = ?, ';
+            params.push(imagemBuffer);
+        }
+
+        if (novaSenha && senhaAtual) {
+            const userResult = await new Promise((resolve, reject) => {
+                db.query('SELECT senha FROM usuario WHERE id = ?', [userId], (err, data) => {
+                    if (err) return reject(err);
+                    resolve(data[0]);
+                });
+            });
+
+            const senhaOk = await bcrypt.compare(senhaAtual, userResult.senha);
+            if (!senhaOk) return res.status(400).json({ message: 'Senha atual incorreta.' });
+
+            const senhaCriptografada = await bcrypt.hash(novaSenha, 10);
+            query += 'senha = ?, ';
+            params.push(senhaCriptografada);
+        }
+
+        // Remove vírgula final e adiciona condição WHERE
+        query = query.slice(0, -2) + ' WHERE id = ?';
+        params.push(userId);
+
+        db.query(query, params, (err) => {
+            if (err) return res.status(500).json({ message: 'Erro ao atualizar.' });
+            res.json({ message: 'Dados atualizados com sucesso!' });
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Erro ao processar a imagem.' });
+    }
+});
 
