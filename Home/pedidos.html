@@ -53,8 +53,7 @@
   </style>
 </head>
 <body>
-  <h1>Lista de Carros</h1>
-  <div class="carros-container" id="carros"></div>
+  <h1>Meus pedidos</h1>
 
   <div class="pedido-container" id="pedidos"></div>
 
@@ -65,23 +64,6 @@
       if (!res.ok) throw new Error("Usuário não autenticado");
       const data = await res.json();
       return data.usuario;
-    }
-
-    async function carregarCarros() {
-      const container = document.getElementById('carros');
-      const res = await fetch('http://localhost:3000/api/carros');
-      const carros = await res.json();
-
-      container.innerHTML = '';
-      carros.forEach(carro => {
-        container.innerHTML += `
-          <div class="card">
-            <img src="${carro.imagem}" alt="${carro.nome}">
-            <h3>${carro.nome}</h3>
-            <button class="btn-comprar" onclick="criarPedido(${carro.id})">Comprar</button>
-          </div>
-        `;
-      });
     }
 
     async function criarPedido(carro_id) {
@@ -111,7 +93,7 @@
         const pedidos = await res.json();
 
         const container = document.getElementById('pedidos');
-        container.innerHTML = '<h2>Meus Pedidos</h2><div class="cards-pedidos" id="cardsPedidos"></div>';
+        container.innerHTML = '<div class="cards-pedidos" id="cardsPedidos"></div>';
         const cards = document.getElementById('cardsPedidos');
 
         pedidos.forEach(pedido => {
@@ -140,7 +122,6 @@
     }
 
     // Inicialização
-    carregarCarros();
     carregarPedidos();
   </script>
 </body>

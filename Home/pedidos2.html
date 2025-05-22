@@ -51,6 +51,8 @@
         </section>
     </main>
 
+    <div class="pedido-container" id="pedidos"></div>
+
     <button id="backToTop">⬆</button>
 
     <script src="script.js"></script>
@@ -132,6 +134,7 @@
             }
             // Chama a função para carregar os carros ao carregar a página
             carregarCarros();
+            carregarPedidos();
         };
     
         // Função de logout
@@ -164,6 +167,31 @@
             } catch (error) {
                 console.error('Erro ao carregar carros:', error);
             }
+        }
+
+        async function carregarPedidos() {
+        try {
+            const usuario = await buscarUsuarioLogado();
+
+            const res = await fetch(`http://localhost:3000/api/pedidos/usuario/${usuario.id}`);
+            const pedidos = await res.json();
+
+            const container = document.getElementById('pedidos');
+            container.innerHTML = '<div class="cards-pedidos" id="cardsPedidos"></div>';
+            const cards = document.getElementById('cardsPedidos');
+
+            pedidos.forEach(pedido => {
+            cards.innerHTML += `
+                <div class="card-pedido">
+                <img src="${pedido.imagem}" alt="${pedido.nome}">
+                <h3>${pedido.nome}</h3>
+                <button class="btn-cancelar" onclick="cancelarPedido(${pedido.pedido_id})">Cancelar</button>
+                </div>
+            `;
+            });
+        } catch (error) {
+            console.error('Erro ao carregar pedidos:', error);
+        }
         }
 
         function mostrarCarros(carros) {
@@ -203,37 +231,6 @@
             });
         }
 
-        // Função para filtrar carros pelo nome
-        function filtrarCarros() {
-            const buscaInput = document.getElementById('buscaCarro');
-            if (!buscaInput) return; // Garante que o input existe
-
-            const texto = buscaInput.value.toLowerCase();
-            const filtrados = carrosCache.filter(carro => carro.nome.toLowerCase().includes(texto));
-            mostrarCarros(filtrados);
-        }
-
-        // Evento para capturar a digitação no input de busca
-        document.getElementById('buscaCarro')?.addEventListener('input', filtrarCarros);
-
-        // Script para o botão "Voltar ao Topo"
-        const backToTopButton = document.getElementById('backToTop');
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 200) { // Mostra o botão após rolar 200px
-                backToTopButton.style.display = 'block';
-            } else {
-                backToTopButton.style.display = 'none';
-            }
-        });
-
-        backToTopButton.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
         async function buscarUsuarioLogado() {
         const res = await fetch('http://localhost:3000/api/usuario', { credentials: 'include' });
         if (!res.ok) throw new Error("Usuário não autenticado");
@@ -262,3 +259,41 @@
     </script>
 </body>
 </html>
+
+
+<!-- function mostrarCarros(carros) {
+            // O alvo agora é o div que conterá os "cart-container" dinâmicos
+            const lista = document.getElementById('carros-listagem-container'); 
+            if (!lista) {
+                console.error("Elemento 'carros-listagem-container' não encontrado.");
+                return;
+            }
+            lista.innerHTML = ''; // Limpa a lista
+
+            carros.forEach(carro => {
+                // Cada item da lista será um div com a classe 'cart-container'
+                const item = document.createElement('div');
+                item.classList.add('cart-container'); 
+
+                item.innerHTML = `
+                    <div class="car-photo">
+                        <img src="${carro.imagem}" alt="${carro.nome}">
+                    </div>
+                    <div class="car-info">
+                        <div class="info-item">
+                            <strong>Nome do Carro:</strong>
+                            <input type="text" value="${carro.nome}" disabled>
+                        </div>
+                        <div class="info-item">
+                            <strong>Valor:</strong>
+                            <input type="text" value="R$ ${parseFloat(carro.preco).toFixed(2)}" disabled>
+                        </div>
+                        <div class="buttons">
+                            <a href="striker.html?id=${carro.id}" class="ver-btn">Ver Carro</a>
+                            <button class="btn-comprar" onclick="criarPedido(${carro.id})">Comprar</button>
+                        </div>
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+        } -->

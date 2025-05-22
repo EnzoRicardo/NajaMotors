@@ -14,7 +14,6 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.static('./Home'));
 
 app.use(session({
     secret: 'carro',
@@ -490,13 +489,6 @@ app.delete('/api/modelo/:id', (req, res) => {
     });
 });
 
-function authMiddleware(req, res, next) {
-    if (req.session.user) {
-        next();
-    } else {
-        res.status(401).json({ message: 'Não autorizado' });
-    }
-}
 
 // API listar Texto
 app.get('/api/texto', (req, res) => {
@@ -557,6 +549,16 @@ app.delete('/api/texto/:id', (req, res) => {
         res.status(200).json({ message: 'Texto excluído com sucesso!' });
     });
 });
+
+function authMiddleware(req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401).json({ message: 'Não autorizado' });
+    }
+}
+
+
 
 
 const path = require('path');
@@ -634,7 +636,7 @@ app.get('/api/pedidos/usuario/:id', (req, res) => {
 
     const pedidosFormatados = results.map(pedido => ({
       pedido_id: pedido.pedido_id,
-      nome: `${pedido.marca} ${pedido.modelo}`,
+      nome: `${pedido.modelo}`,
       imagem: pedido.imagem
         ? `data:image/jpeg;base64,${pedido.imagem.toString('base64')}`
         : null
@@ -668,3 +670,38 @@ app.get('/api/pedido', (req, res) => {
         res.status(200).json(results);
     });
 });
+
+// Servir o arquivo index.html na raiz
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Home', 'index.html'));
+});
+
+
+// Middleware para proteger arquivos específicos
+const arquivosProtegidos = ['/crud.html', '/crudcarro.html', '/crudmarca.html', '/crudmodelo.html', '/crudpedido.html', '/crudtexto.html'];
+const arquivosLogin = ['/pedidos.html'];
+
+app.use((req, res, next) => {
+    // Protege rotas que precisam de login e admin
+    if (arquivosProtegidos.includes(req.path)) {
+        if (!req.session.user) {
+            return res.redirect('/login/login.html');
+        }
+        if (req.session.user.funcao !== 'admin') {
+            return res.redirect('/index.html'); // Ou outra página como /403.html
+        }
+    }
+
+    // Protege rotas que só precisam de login
+    if (arquivosLogin.includes(req.path)) {
+        if (!req.session.user) {
+            return res.redirect('/login/login.html');
+        }
+    }
+
+    next();
+});
+
+// Middleware para servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'Home')));
+
