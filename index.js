@@ -145,7 +145,7 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
     console.log('File:', req.file);
 
 
-    const { ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+    const { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
 
     const imagemBuffer = req.file ? req.file.buffer : null;
 
@@ -153,8 +153,8 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
         console.log("Nenhuma imagem foi enviada.");
     }
 
-    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(insert, [ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer], (err) => {
+    const insert = 'INSERT INTO Carro (ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(insert, [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer], (err) => {
         if (err) return res.status(500).json({ message: 'Erro ao cadastrar carro.' });
         res.status(200).json({ message: 'Carro cadastrado com sucesso!' });
     });
@@ -164,12 +164,11 @@ app.post('/api/cadastrarC', upload.single('imagem'), async (req, res) => {
 // API Atualizar Carro
 
 app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
-    const { ano, preco, modelo, texto, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
+    const { ano, preco, modelo, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo } = req.body;
     const id = req.params.id;
     const imagemBuffer = req.file ? req.file.buffer : null;
 
     const modelo_id = modelo; // já é o ID enviado pelo front-end
-    const texto_id = texto;
 
     let updateQuery;
     let params;
@@ -177,19 +176,19 @@ app.put('/api/carro/:id', upload.single('imagem'), async (req, res) => {
     if (imagemBuffer) {
         updateQuery = `
             UPDATE Carro 
-            SET ano = ?, preco = ?, modelo_id = ?, texto_id = ?, velocidademax = ?, aceleracao = ?, 
+            SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, 
                 motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
                 consumo = ?, imagem = ?
             WHERE id = ?`;
-        params = [ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id];
+        params = [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagemBuffer, id];
     } else {
         updateQuery = `
             UPDATE Carro 
-            SET ano = ?, preco = ?, modelo_id = ?, texto_id = ?, velocidademax = ?, aceleracao = ?, 
+            SET ano = ?, preco = ?, modelo_id = ?, velocidademax = ?, aceleracao = ?, 
                 motor = ?, cor = ?, potencia = ?, cambio = ?, torque = ?, tracao = ?, 
                 consumo = ?
             WHERE id = ?`;
-        params = [ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id];
+        params = [ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, id];
     }
 
     db.query(updateQuery, params, (err) => {
@@ -222,13 +221,27 @@ app.get('/api/carro', (req, res) => {
         Marca.nome AS marca,
         Modelo.nome AS modelo,
         Carro.ano,
-        preco,
-        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem,
-        Texto.descricao1 AS descricao1
+        Carro.preco,
+        Carro.velocidademax, 
+        Carro.aceleracao, 
+        Carro.motor, 
+        Carro.cor, 
+        Carro.potencia, 
+        Carro.cambio, 
+        Carro.torque, 
+        Carro.tracao, 
+        Carro.consumo, 
+        Carro.imagem,
+        Texto.descricao1,
+        Texto.descricao2,
+        Texto.descricao3,
+        Texto.titulo1,
+        Texto.titulo2
     FROM Carro
     JOIN Modelo ON Carro.modelo_id = Modelo.id
     JOIN Marca ON Modelo.marca_id = Marca.id
-    JOIN Texto on Carro.texto_id = Texto.id;
+    LEFT JOIN Texto ON Texto.carro_id = Carro.id;
+
     `;
 
     db.query(sql, (err, results) => {
@@ -248,14 +261,27 @@ app.get('/api/carros/:id', (req, res) => {
         Marca.nome AS marca,
         Modelo.nome AS modelo,
         Carro.ano,
-        preco,
-        velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo,
-        Texto.descricao1, Texto.descricao2, Texto.descricao3, Texto.titulo1, Texto.titulo2
+        Carro.preco,
+        Carro.velocidademax, 
+        Carro.aceleracao, 
+        Carro.motor, 
+        Carro.cor, 
+        Carro.potencia, 
+        Carro.cambio, 
+        Carro.torque, 
+        Carro.tracao, 
+        Carro.consumo,
+        Texto.descricao1,
+        Texto.descricao2,
+        Texto.descricao3,
+        Texto.titulo1,
+        Texto.titulo2
     FROM Carro
     JOIN Modelo ON Carro.modelo_id = Modelo.id
     JOIN Marca ON Modelo.marca_id = Marca.id
-    JOIN Texto ON Carro.texto_id = Texto.id
+    LEFT JOIN Texto ON Texto.carro_id = Carro.id
     WHERE Carro.id = ?;
+
     `;
 
     db.query(sql, [id], (err, results) => {
@@ -485,16 +511,16 @@ app.get('/api/texto', (req, res) => {
 
 // Criar novo Texto
 app.post('/api/cadastrarT', (req, res) => {
-    const { descricao1, descricao2, descricao3, titulo1, titulo2 } = req.body;
+    const { carro_id, descricao1, descricao2, descricao3, titulo1, titulo2 } = req.body;
 
     // Validação simples
-    if (!descricao1 || !descricao2 || !descricao3 || !titulo1 || !titulo2) {
+    if (!carro_id || !descricao1 || !descricao2 || !descricao3 || !titulo1 || !titulo2) {
         return res.status(400).json({ message: 'Campos obrigatórios.' });
     }
 
-    const sql = 'INSERT INTO Texto (descricao1, descricao2, descricao3, titulo1, titulo2)  VALUES (?, ?, ?, ?, ?)';
+    const sql = 'INSERT INTO Texto (carro_id, descricao1, descricao2, descricao3, titulo1, titulo2)  VALUES (?, ?, ?, ?, ?, ?)';
 
-    db.query(sql, [descricao1, descricao2, descricao3, titulo1, titulo2], (err, result) => {
+    db.query(sql, [carro_id, descricao1, descricao2, descricao3, titulo1, titulo2], (err, result) => {
         if (err) {
             console.error('Erro ao inserir textos:', err);
             return res.status(500).json({ message: 'Erro ao criar texto.' });
@@ -511,15 +537,22 @@ app.post('/api/cadastrarT', (req, res) => {
 // API Update de Texto
 app.put('/api/texto/:id', (req, res) => {
     const { id } = req.params;
-    const { titulo1, titulo2, descricao1, descricao2, descricao3 } = req.body;
+    const { carro_id, titulo1, titulo2, descricao1, descricao2, descricao3 } = req.body;
 
-    db.query('UPDATE Texto SET titulo1 = ?, titulo2 = ?, descricao1 = ?, descricao2 = ?, descricao3 = ? WHERE id = ?', [titulo1, titulo2, descricao1, descricao2, descricao3, id], (err, results) => {
+    db.query('UPDATE Texto SET carro_id = ?, titulo1 = ?, titulo2 = ?, descricao1 = ?, descricao2 = ?, descricao3 = ? WHERE id = ?', [carro_id, titulo1, titulo2, descricao1, descricao2, descricao3, id], (err, results) => {
         if (err) return res.status(500).json({ message: 'Erro ao atualizar texto.' });
         res.status(200).json({ message: 'Texto atualizado com sucesso!' });
     });
 });
 
-
+// API Deletar Texto
+app.delete('/api/texto/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM Texto WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Erro ao excluir Texto.' });
+        res.status(200).json({ message: 'Texto excluído com sucesso!' });
+    });
+});
 
 
 const path = require('path');

@@ -35,12 +35,14 @@ nav {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+    margin-left: 10px;
 }
 
 .crud-container h2 {
     color: #911924;
     font-size: 32px;
     text-align: center;
+    margin-right: -598px;
     margin-bottom: 30px;
     text-transform: uppercase;
 }
@@ -90,6 +92,7 @@ button.cadastrar {
     background-color: orange;
     display: block;
     margin: 0 auto 20px;
+    margin-right: 132px;
 }
 
 button.editar {

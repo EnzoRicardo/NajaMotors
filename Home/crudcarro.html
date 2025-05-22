@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="crud.css">
     <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 </head>
 <body>
     <header>
@@ -33,7 +34,6 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>ID Texto</th>
                     <th>Ano</th>
                     <th>Preço</th>
                     <th>Modelo</th>
@@ -61,7 +61,6 @@
 
         const carregar = async () => {
             try {
-
                 lista.innerHTML = '';
 
                 const response = await fetch('http://localhost:3000/api/carro', {
@@ -69,7 +68,6 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    /* crendetials: true para cookies*/
                 });
 
                 if (!response.ok) throw new Error('Erro ao buscar carros');
@@ -80,7 +78,6 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                     <td>${car.id}</td>
-                    <td>${car.texto_id}</td>
                     <td>${car.ano}</td>
                     <td>${car.preco}</td>
                     <td>${car.modelo}</td>
@@ -114,9 +111,6 @@
         window.onload = carregar;
 
         const editarCarro = async (id) => {
-            const resTexto = await fetch('http://localhost:3000/api/texto');
-            const textos = await resTexto.json();
-
             // 🔄 Buscar os modelos com marcas
             const resModelos = await fetch('http://localhost:3000/api/modelos');
             const modelos = await resModelos.json();
@@ -124,16 +118,10 @@
             if (!resModelos.ok || modelos.length === 0) {
                 return Swal.fire("Erro", "Nenhum modelo disponível para cadastro.", "error");
             }
-            
-            if (!resTexto.ok || textos.length === 0) {
-                return Swal.fire("Erro", "Nenhum texto disponível para cadastro.", "error");
-            }
 
             // Criar options para o select
             const options = modelos.map(m => `<option value="${m.id}">${m.modelo} (${m.marca})</option>`).join('');
-            const optionstexto = modelos.map(t => `<option value="${t.id}">Texto ID:(${t.id})</option>`).join('');
 
-            // Pegando a linha com base no ID do usuário
             const carRow = Array.from(document.querySelectorAll('tr')).find(row => row.cells[0].textContent == id);
 
             if (!carRow) {
@@ -142,19 +130,19 @@
             }
 
             // Pegando os dados atuais
-            const ano = carRow.children[2].textContent;
-            const preco = carRow.children[3].textContent;
-            const modelo = carRow.children[4].textContent;
-            const texto = carRow.children[5].textContent;
-            const velocidademax = carRow.children[6].textContent;
-            const aceleracao = carRow.children[7].textContent;
-            const motor = carRow.children[8].textContent;
-            const cor = carRow.children[9].textContent;
-            const potencia = carRow.children[10].textContent;
-            const cambio = carRow.children[11].textContent;
-            const torque = carRow.children[12].textContent;
-            const tracao = carRow.children[13].textContent;
-            const consumo = carRow.children[14].textContent;
+            const ano = carRow.children[1].textContent;
+            const preco = carRow.children[2].textContent;
+            const modelo = carRow.children[3].textContent;
+            const texto = carRow.children[4].textContent;
+            const velocidademax = carRow.children[5].textContent;
+            const aceleracao = carRow.children[6].textContent;
+            const motor = carRow.children[7].textContent;
+            const cor = carRow.children[8].textContent;
+            const potencia = carRow.children[9].textContent;
+            const cambio = carRow.children[10].textContent;
+            const torque = carRow.children[11].textContent;
+            const tracao = carRow.children[12].textContent;
+            const consumo = carRow.children[13].textContent;
 
             const { value: formValues } = await Swal.fire({
                 title: 'Editar Usuário',
@@ -164,10 +152,6 @@
                     <select id="swal-modelo" class="swal2-input swal2-select">
                             <option value="">Selecione um modelo</option>
                             ${options}
-                    </select>
-                    <select id="swal-texto" class="swal2-input swal2-select">
-                            <option value="">Selecione um texto</option>
-                            ${optionstexto}
                     </select>
                     <input id="swal-velocidademax" class="swal2-input" placeholder="Velocidade Máxima" value="${velocidademax}">
                     <input id="swal-aceleracao" class="swal2-input" placeholder="Aceleração" value="${aceleracao}">
@@ -188,7 +172,6 @@
                     const ano = document.getElementById('swal-ano').value.trim();
                     const preco = document.getElementById('swal-preco').value.trim();
                     const modelo_id = document.getElementById('swal-modelo').value;
-                    const texto_id = document.getElementById('swal-texto').value;
                     const velocidademax = document.getElementById('swal-velocidademax').value.trim();
                     const aceleracao = document.getElementById('swal-aceleracao').value.trim();
                     const motor = document.getElementById('swal-motor').value.trim();
@@ -199,7 +182,7 @@
                     const tracao = document.getElementById('swal-tracao').value.trim();
                     const consumo = document.getElementById('swal-consumo').value.trim();
 
-                    return { ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
+                    return { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
                 }
 
             });
@@ -212,7 +195,6 @@
                     formData.append("ano", formValues.ano);
                     formData.append("preco", formValues.preco);
                     formData.append("modelo", formValues.modelo_id);
-                    formData.append("texto", formValues.texto_id);
                     formData.append("velocidademax", formValues.velocidademax);
                     formData.append("aceleracao", formValues.aceleracao);
                     formData.append("motor", formValues.motor);
@@ -248,41 +230,35 @@
                 text: "Você realmente deseja excluir esse carro?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Sim, excluir",
-                cancelButtonText: "Cancelar"
-            });
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, delete!',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
 
-            if (confirmar.isConfirmed) {
-                try {
-                    const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                        if (!response.ok) throw new Error('Erro ao deletar');
 
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        Swal.fire("Excluído!", result.message, "success");
-                        carregar(); // Atualiza a lista
-                    } else {
-                        Swal.fire("Erro", result.message, "error");
+                        Swal.fire(
+                            'Deletado!',
+                            'O carro foi deletado.',
+                            'success'
+                        );
+                        carregar();
+                    } catch (error) {
+                        Swal.fire('Erro', error.message, 'error');
                     }
-                } catch (error) {
-                    Swal.fire("Erro", "Não foi possível excluir o carro.", "error");
-                    console.error(error);
                 }
-            }
+            });
         };
 
         const cadastrarCarro = async () => {
             try {
-                const resTexto = await fetch('http://localhost:3000/api/texto');
-                const textos = await resTexto.json();
-
                 // 🔄 Buscar os modelos com marcas
                 const resModelos = await fetch('http://localhost:3000/api/modelos');
                 const modelos = await resModelos.json();
@@ -290,14 +266,9 @@
                 if (!resModelos.ok || modelos.length === 0) {
                     return Swal.fire("Erro", "Nenhum modelo disponível para cadastro.", "error");
                 }
-                
-                if (!resTexto.ok || textos.length === 0) {
-                    return Swal.fire("Erro", "Nenhum texto disponível para cadastro.", "error");
-                }
 
                 // Criar options para o select
                 const options = modelos.map(m => `<option value="${m.id}">${m.modelo} (${m.marca})</option>`).join('');
-                const optionstexto = modelos.map(t => `<option value="${t.id}">Texto ID:(${t.id})</option>`).join('');
 
                 const { value: formValues } = await Swal.fire({
                     title: 'Cadastrar Novo Carro',
@@ -307,10 +278,6 @@
                         <select id="swal-modelo" class="swal2-input swal2-select">
                             <option value="">Selecione um modelo</option>
                             ${options}
-                        </select>
-                        <select id="swal-texto" class="swal2-input swal2-select">
-                            <option value="">Selecione um texto</option>
-                            ${optionstexto}
                         </select>
                         <input id="swal-velocidademax" class="swal2-input" placeholder="Velocidade Máxima">
                         <input id="swal-aceleracao" class="swal2-input" placeholder="Aceleração">
@@ -331,7 +298,6 @@
                         const ano = document.getElementById('swal-ano').value.trim();
                         const preco = document.getElementById('swal-preco').value.trim();
                         const modelo_id = document.getElementById('swal-modelo').value;
-                        const texto_id = document.getElementById('swal-texto').value;
                         const velocidademax = document.getElementById('swal-velocidademax').value.trim();
                         const aceleracao = document.getElementById('swal-aceleracao').value.trim();
                         const motor = document.getElementById('swal-motor').value.trim();
@@ -342,12 +308,12 @@
                         const tracao = document.getElementById('swal-tracao').value.trim();
                         const consumo = document.getElementById('swal-consumo').value.trim();
 
-                        if (!ano || !preco || !modelo_id || !texto_id || !velocidademax || !aceleracao || !motor || !cor || !potencia || !cambio || !torque || !tracao || !consumo || !imagem) {
+                        if (!ano || !preco || !modelo_id || !velocidademax || !aceleracao || !motor || !cor || !potencia || !cambio || !torque || !tracao || !consumo || !imagem) {
                             Swal.showValidationMessage("Preencha todos os campos!");
                             return false;
                         }
 
-                        return { ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
+                        return { ano, preco, modelo_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
                     }
                 });
 
@@ -359,7 +325,6 @@
                     formData.append("ano", formValues.ano);
                     formData.append("preco", formValues.preco);
                     formData.append("modelo_id", formValues.modelo_id);
-                    formData.append("texto_id", formValues.texto_id);
                     formData.append("velocidademax", formValues.velocidademax);
                     formData.append("aceleracao", formValues.aceleracao);
                     formData.append("motor", formValues.motor);
@@ -390,9 +355,6 @@
                 console.error(error);
             }
         };
-
-
-
     </script>
 </body>
 </html>
