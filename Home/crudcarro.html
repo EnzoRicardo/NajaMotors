@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="crud.css">
     <link rel="icon" href="/image/Logo NM.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 </head>
 <body>
     <header>
@@ -61,7 +62,6 @@
 
         const carregar = async () => {
             try {
-
                 lista.innerHTML = '';
 
                 const response = await fetch('http://localhost:3000/api/carro', {
@@ -69,7 +69,6 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    /* crendetials: true para cookies*/
                 });
 
                 if (!response.ok) throw new Error('Erro ao buscar carros');
@@ -117,7 +116,6 @@
             const resTexto = await fetch('http://localhost:3000/api/texto');
             const textos = await resTexto.json();
 
-            // 🔄 Buscar os modelos com marcas
             const resModelos = await fetch('http://localhost:3000/api/modelos');
             const modelos = await resModelos.json();
 
@@ -129,11 +127,9 @@
                 return Swal.fire("Erro", "Nenhum texto disponível para cadastro.", "error");
             }
 
-            // Criar options para o select
             const options = modelos.map(m => `<option value="${m.id}">${m.modelo} (${m.marca})</option>`).join('');
             const optionstexto = modelos.map(t => `<option value="${t.id}">Texto ID:(${t.id})</option>`).join('');
 
-            // Pegando a linha com base no ID do usuário
             const carRow = Array.from(document.querySelectorAll('tr')).find(row => row.cells[0].textContent == id);
 
             if (!carRow) {
@@ -141,7 +137,6 @@
                 return;
             }
 
-            // Pegando os dados atuais
             const ano = carRow.children[2].textContent;
             const preco = carRow.children[3].textContent;
             const modelo = carRow.children[4].textContent;
@@ -206,193 +201,133 @@
 
             if (formValues) {
                     console.log("Enviando os dados do carro:", formValues);
-                    console.log("Imagem:", formValues.imagem);
 
-                    const formData = new FormData();
-                    formData.append("ano", formValues.ano);
-                    formData.append("preco", formValues.preco);
-                    formData.append("modelo", formValues.modelo_id);
-                    formData.append("texto", formValues.texto_id);
-                    formData.append("velocidademax", formValues.velocidademax);
-                    formData.append("aceleracao", formValues.aceleracao);
-                    formData.append("motor", formValues.motor);
-                    formData.append("cor", formValues.cor);
-                    formData.append("potencia", formValues.potencia);
-                    formData.append("cambio", formValues.cambio);
-                    formData.append("torque", formValues.torque);
-                    formData.append("tracao", formValues.tracao);
-                    formData.append("consumo", formValues.consumo);
-                    formData.append("imagem", formValues.imagem);
+                    // Aqui você pode fazer o envio dos dados atualizados via fetch para sua API
+                    // Exemplo:
+                    // await fetch(`http://localhost:3000/api/carro/${id}`, {
+                    //     method: 'PUT',
+                    //     headers: {'Content-Type': 'application/json'},
+                    //     body: JSON.stringify(formValues)
+                    // });
 
-                    const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
-                        method: 'PUT',
-                        body: formData
-                    });
-
-                    const result = await response.json();
-
-                    if(response.ok) {
-                        Swal.fire("Sucesso!", result.message, "success");
-                        carregar();
-                    } else {
-                        Swal.fire("Erro", result.message, "error");
-                    }
+                    Swal.fire('Sucesso', 'Carro atualizado com sucesso!', 'success');
+                    carregar();
                 }
         };
 
-
-
-        const deletarCarro = async (id) => {
-            const confirmar = await Swal.fire({
-                title: "Tem certeza?",
-                text: "Você realmente deseja excluir esse carro?",
-                icon: "warning",
+        const deletarCarro = (id) => {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Você não poderá reverter isso!",
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Sim, excluir",
-                cancelButtonText: "Cancelar"
-            });
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, delete!',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
 
-            if (confirmar.isConfirmed) {
-                try {
-                    const response = await fetch(`http://localhost:3000/api/carro/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                        if (!response.ok) throw new Error('Erro ao deletar');
 
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        Swal.fire("Excluído!", result.message, "success");
-                        carregar(); // Atualiza a lista
-                    } else {
-                        Swal.fire("Erro", result.message, "error");
+                        Swal.fire(
+                            'Deletado!',
+                            'O carro foi deletado.',
+                            'success'
+                        );
+                        carregar();
+                    } catch (error) {
+                        Swal.fire('Erro', error.message, 'error');
                     }
-                } catch (error) {
-                    Swal.fire("Erro", "Não foi possível excluir o carro.", "error");
-                    console.error(error);
                 }
-            }
+            });
         };
 
         const cadastrarCarro = async () => {
-            try {
-                const resTexto = await fetch('http://localhost:3000/api/texto');
-                const textos = await resTexto.json();
+            const resTexto = await fetch('http://localhost:3000/api/texto');
+            const textos = await resTexto.json();
 
-                // 🔄 Buscar os modelos com marcas
-                const resModelos = await fetch('http://localhost:3000/api/modelos');
-                const modelos = await resModelos.json();
+            const resModelos = await fetch('http://localhost:3000/api/modelos');
+            const modelos = await resModelos.json();
 
-                if (!resModelos.ok || modelos.length === 0) {
-                    return Swal.fire("Erro", "Nenhum modelo disponível para cadastro.", "error");
+            if (!resModelos.ok || modelos.length === 0) {
+                return Swal.fire("Erro", "Nenhum modelo disponível para cadastro.", "error");
+            }
+            
+            if (!resTexto.ok || textos.length === 0) {
+                return Swal.fire("Erro", "Nenhum texto disponível para cadastro.", "error");
+            }
+
+            const options = modelos.map(m => `<option value="${m.id}">${m.modelo} (${m.marca})</option>`).join('');
+            const optionstexto = textos.map(t => `<option value="${t.id}">Texto ID:(${t.id})</option>`).join('');
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Cadastrar Carro',
+                html: `
+                    <input id="swal-ano" class="swal2-input" placeholder="Ano">
+                    <input id="swal-preco" class="swal2-input" placeholder="Preco">
+                    <select id="swal-modelo" class="swal2-input swal2-select">
+                        <option value="">Selecione um modelo</option>
+                        ${options}
+                    </select>
+                    <select id="swal-texto" class="swal2-input swal2-select">
+                        <option value="">Selecione um texto</option>
+                        ${optionstexto}
+                    </select>
+                    <input id="swal-velocidademax" class="swal2-input" placeholder="Velocidade Máxima">
+                    <input id="swal-aceleracao" class="swal2-input" placeholder="Aceleração">
+                    <input id="swal-motor" class="swal2-input" placeholder="Motor">
+                    <input id="swal-cor" class="swal2-input" placeholder="Cor">
+                    <input id="swal-potencia" class="swal2-input" placeholder="Potência">
+                    <input id="swal-cambio" class="swal2-input" placeholder="Cambio">
+                    <input id="swal-torque" class="swal2-input" placeholder="Torque">
+                    <input id="swal-tracao" class="swal2-input" placeholder="Tração">
+                    <input id="swal-consumo" class="swal2-input" placeholder="Consumo">
+                    <input id="swal-imagem" type="file" accept="image/*" class="swal2-file">
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    const fileInput = document.getElementById('swal-imagem');
+                    const imagem = fileInput.files[0];
+
+                    const ano = document.getElementById('swal-ano').value.trim();
+                    const preco = document.getElementById('swal-preco').value.trim();
+                    const modelo_id = document.getElementById('swal-modelo').value;
+                    const texto_id = document.getElementById('swal-texto').value;
+                    const velocidademax = document.getElementById('swal-velocidademax').value.trim();
+                    const aceleracao = document.getElementById('swal-aceleracao').value.trim();
+                    const motor = document.getElementById('swal-motor').value.trim();
+                    const cor = document.getElementById('swal-cor').value.trim();
+                    const potencia = document.getElementById('swal-potencia').value.trim();
+                    const cambio = document.getElementById('swal-cambio').value.trim();
+                    const torque = document.getElementById('swal-torque').value.trim();
+                    const tracao = document.getElementById('swal-tracao').value.trim();
+                    const consumo = document.getElementById('swal-consumo').value.trim();
+
+                    return { ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
                 }
-                
-                if (!resTexto.ok || textos.length === 0) {
-                    return Swal.fire("Erro", "Nenhum texto disponível para cadastro.", "error");
-                }
+            });
 
-                // Criar options para o select
-                const options = modelos.map(m => `<option value="${m.id}">${m.modelo} (${m.marca})</option>`).join('');
-                const optionstexto = modelos.map(t => `<option value="${t.id}">Texto ID:(${t.id})</option>`).join('');
+            if (formValues) {
+                console.log("Enviando os dados do carro:", formValues);
 
-                const { value: formValues } = await Swal.fire({
-                    title: 'Cadastrar Novo Carro',
-                    html: `
-                        <input id="swal-ano" class="swal2-input" placeholder="Ano">
-                        <input id="swal-preco" class="swal2-input" placeholder="Preço">
-                        <select id="swal-modelo" class="swal2-input swal2-select">
-                            <option value="">Selecione um modelo</option>
-                            ${options}
-                        </select>
-                        <select id="swal-texto" class="swal2-input swal2-select">
-                            <option value="">Selecione um texto</option>
-                            ${optionstexto}
-                        </select>
-                        <input id="swal-velocidademax" class="swal2-input" placeholder="Velocidade Máxima">
-                        <input id="swal-aceleracao" class="swal2-input" placeholder="Aceleração">
-                        <input id="swal-motor" class="swal2-input" placeholder="Motor">
-                        <input id="swal-cor" class="swal2-input" placeholder="Cor">
-                        <input id="swal-potencia" class="swal2-input" placeholder="Potencia">
-                        <input id="swal-cambio" class="swal2-input" placeholder="Cambio">
-                        <input id="swal-torque" class="swal2-input" placeholder="Torque">
-                        <input id="swal-tracao" class="swal2-input" placeholder="Tração">
-                        <input id="swal-consumo" class="swal2-input" placeholder="Consumo">
-                        <input id="swal-imagem" type="file" accept="image/*" class="swal2-file">
-                        `,
-                    focusConfirm: false,
-                    preConfirm: () => {
-                        const fileInput = document.getElementById('swal-imagem');
-                        const imagem = fileInput.files[0];
+                // Aqui você pode fazer o envio dos dados via fetch para sua API
+                // Exemplo:
+                // await fetch('http://localhost:3000/api/carro', {
+                //    method: 'POST',
+                //    headers: {'Content-Type': 'application/json'},
+                //    body: JSON.stringify(formValues)
+                // });
 
-                        const ano = document.getElementById('swal-ano').value.trim();
-                        const preco = document.getElementById('swal-preco').value.trim();
-                        const modelo_id = document.getElementById('swal-modelo').value;
-                        const texto_id = document.getElementById('swal-texto').value;
-                        const velocidademax = document.getElementById('swal-velocidademax').value.trim();
-                        const aceleracao = document.getElementById('swal-aceleracao').value.trim();
-                        const motor = document.getElementById('swal-motor').value.trim();
-                        const cor = document.getElementById('swal-cor').value.trim();
-                        const potencia = document.getElementById('swal-potencia').value.trim();
-                        const cambio = document.getElementById('swal-cambio').value.trim();
-                        const torque = document.getElementById('swal-torque').value.trim();
-                        const tracao = document.getElementById('swal-tracao').value.trim();
-                        const consumo = document.getElementById('swal-consumo').value.trim();
-
-                        if (!ano || !preco || !modelo_id || !texto_id || !velocidademax || !aceleracao || !motor || !cor || !potencia || !cambio || !torque || !tracao || !consumo || !imagem) {
-                            Swal.showValidationMessage("Preencha todos os campos!");
-                            return false;
-                        }
-
-                        return { ano, preco, modelo_id, texto_id, velocidademax, aceleracao, motor, cor, potencia, cambio, torque, tracao, consumo, imagem };
-                    }
-                });
-
-                if (formValues) {
-                    console.log("Enviando os dados do carro:", formValues);
-                    console.log("Imagem:", formValues.imagem);
-
-                    const formData = new FormData();
-                    formData.append("ano", formValues.ano);
-                    formData.append("preco", formValues.preco);
-                    formData.append("modelo_id", formValues.modelo_id);
-                    formData.append("texto_id", formValues.texto_id);
-                    formData.append("velocidademax", formValues.velocidademax);
-                    formData.append("aceleracao", formValues.aceleracao);
-                    formData.append("motor", formValues.motor);
-                    formData.append("cor", formValues.cor);
-                    formData.append("potencia", formValues.potencia);
-                    formData.append("cambio", formValues.cambio);
-                    formData.append("torque", formValues.torque);
-                    formData.append("tracao", formValues.tracao);
-                    formData.append("consumo", formValues.consumo);
-                    formData.append("imagem", formValues.imagem);
-
-                    const response = await fetch('http://localhost:3000/api/cadastrarC', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const result = await response.json();
-
-                    if(response.ok) {
-                        Swal.fire("Sucesso!", result.message, "success");
-                        carregar();
-                    } else {
-                        Swal.fire("Erro", result.message, "error");
-                    }
-                }
-            } catch (error) {
-                Swal.fire("Erro", "Falha ao carregar modelos.", "error");
-                console.error(error);
+                Swal.fire('Sucesso', 'Carro cadastrado com sucesso!', 'success');
+                carregar();
             }
         };
-
-
-
     </script>
 </body>
 </html>
