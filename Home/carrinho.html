@@ -43,6 +43,14 @@
     <main class="pedido-container">
         <h2>Buscar Carro</h2>
         <input type="text" id="buscaCarro" placeholder="Digite o nome do carro..." />
+        <div class="filtros">
+            <label for="filtroPreco">Ordenar por preço:</label>
+            <select id="filtroPreco">
+                <option value="">-- Selecione --</option>
+                <option value="asc">Menor para Maior</option>
+                <option value="desc">Maior para Menor</option>
+            </select>
+        </div>
 
         <!-- A seção "cart" agora conterá a listagem dinâmica de carros.
              Cada carro será um "cart-container" individual. -->
@@ -206,13 +214,29 @@
 
         // Função para filtrar carros pelo nome
         function filtrarCarros() {
-            const buscaInput = document.getElementById('buscaCarro');
-            if (!buscaInput) return; // Garante que o input existe
+    const buscaInput = document.getElementById('buscaCarro');
+    const filtroPreco = document.getElementById('filtroPreco');
 
+    let resultado = carrosCache;
+
+    // Filtro por nome
+        if (buscaInput && buscaInput.value.trim() !== '') {
             const texto = buscaInput.value.toLowerCase();
-            const filtrados = carrosCache.filter(carro => carro.nome.toLowerCase().includes(texto));
-            mostrarCarros(filtrados);
+            resultado = resultado.filter(carro => carro.nome.toLowerCase().includes(texto));
         }
+
+        // Ordenação por preço
+        if (filtroPreco && filtroPreco.value) {
+            resultado.sort((a, b) => {
+                const precoA = parseFloat(a.preco);
+                const precoB = parseFloat(b.preco);
+                return filtroPreco.value === 'asc' ? precoA - precoB : precoB - precoA;
+            });
+        }
+
+        mostrarCarros(resultado);
+    }
+
 
         // Evento para capturar a digitação no input de busca
         document.getElementById('buscaCarro')?.addEventListener('input', filtrarCarros);
