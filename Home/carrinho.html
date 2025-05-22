@@ -3,41 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrinho</title>
-    <link rel="stylesheet" href="carrinho.css">
+    <title>Lista de Carros</title>
+    <link rel="stylesheet" href="carrinho.css"> 
+    <link rel="stylesheet" href="pedidos.css">
+    <link rel="icon" href="./IMG/Logo NM.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    <script src="rotas.js"></script>
 </head>
 <body>
     <header>
         <nav>
-            <a class="logo" href="./index.html"> <img src="./IMG/Logo NM.png" alt="NM"> </a>
+            <div class="nav-left">
+                <a class="logo" href="/"> <img src="IMG/Logo NM.png" alt="NM" class="logo-image"> </a>
+            </div>
+
+            <div class="menu-toggle" id="mobile-menu">
+                ☰
+            </div>
+
+            <ul class="nav-list" id="nav-list">
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="#models">Modelos</a></li>
+                <li id="crud-item" style="display: none;"><a href="#" onclick="crud()">CRUD</a></li>
+                <li><a href="#">Fale Conosco</a></li>
+                <li><a id="nomeUsuario"></a></li>
+                <li class="mobile-only" id="login-item"><a href="./Login/login.html">Login</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <a href="./Login/login.html" class="login-btn" id="login-btn">Login</a>
+                <a href="./Login/login.html" class="login-btn" id="logout-btn" onclick="logout()">Logout</a>
+            </div>
         </nav>
     </header>
 
-    <section class="cart">
-        <div class="cart-container">
+    <div class="divider"></div>
 
-            <div class="car-photo">
-                <img src="image/carro.png" alt="Imagem do Carro">
-            </div>
+    <main class="pedido-container">
+        <h2>Buscar Carro</h2>
+        <input type="text" id="buscaCarro" placeholder="Digite o nome do carro..." />
 
-            <div class="car-info">
-                <div class="info-item">
-                    <strong>Nome do Carro:</strong>
-                    <input type="text" value="BMW X6" disabled>
+        <!-- A seção "cart" agora conterá a listagem dinâmica de carros.
+             Cada carro será um "cart-container" individual. -->
+        <section class="cart">
+            <div id="carros-listagem-container">
                 </div>
+        </section>
+    </main>
 
-                <div class="info-item">
-                    <strong>Valor:</strong>
-                    <input type="text" value="R$ 550.000,00" disabled>
-                </div>
+    <button id="backToTop">⬆</button>
 
-                <div class="buttons">
-                    <a href="#" class="ver-btn">Ver Carro</a>
-                    <a href="#" class="comprar-btn">Comprar</a>
-                </div>
-            </div>
+    <script src="script.js"></script>
+    <script>
+        // Lógica do menu mobile
+        const menuToggle = document.getElementById('mobile-menu');
+        const navList = document.getElementById('nav-list');
+    
+        menuToggle.addEventListener('click', () => {
+            navList.classList.toggle('active');
+        });
 
-        </div>
-    </section>
+        document.querySelectorAll('#nav-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                navList.classList.remove('active');
+            });
+        });
+    
+        // Lógica de login/logout e exibição de usuário
+        window.onload = async () => {
+            try {
+                const res = await fetch('http://localhost:3000/api/usuario', {
+                    credentials: 'include'
+                });
+    
+                const loginBtn = document.getElementById('login-btn');
+                const logoutBtn = document.getElementById('logout-btn');
+                const loginItem = document.getElementById('login-item');
+                const crudItem = document.getElementById('crud-item');
+                const pedidosItem = document.getElementById('pedidos-item'); // Se você tiver um item de Pedidos para o usuário
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const nome = data.usuario.name;
+                    const funcao = data.usuario.funcao;
+                    
+                    document.getElementById('nomeUsuario').innerText = `${funcao}: ${nome}`;
+                    
+                    // Mostrar apenas Logout
+                    if (loginBtn) loginBtn.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    if (loginItem) {
+                        loginItem.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
+                    }
+                    // MOSTRAR CRUD APENAS PARA ADMIN
+                    if (funcao === 'admin' && crudItem) {
+                        crudItem.style.display = 'list-item'; 
+                    } else if (crudItem) {
+                        crudItem.style.display = 'none'; // Esconde para não-admin
+                    }
+
+                    // MOSTRAR PEDIDOS APENAS PARA USER (se tiver)
+                    if (funcao === 'user' && pedidosItem) {
+                        pedidosItem.style.display = 'list-item';
+                    } else if (pedidosItem) {
+                        pedidosItem.style.display = 'none'; // Esconde para não-user
+                    }
+    
+                } else {
+                    // Mostrar apenas Login
+                    if (loginBtn) loginBtn.style.display = 'inline-block';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (loginItem) {
+                        loginItem.innerHTML = `<a href="./Login/login.html">Login</a>`;
+                    }
+                    if (crudItem) crudItem.style.display = 'none';
+                    if (pedidosItem) pedidosItem.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar usuário:', error);
+                // Fallback: mostra apenas login
+                if (document.getElementById('login-btn')) document.getElementById('login-btn').style.display = 'inline-block';
+                if (document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
+                if (document.getElementById('login-item')) {
+                    document.getElementById('login-item').innerHTML = `<a href="./Login/login.html">Login</a>`;
+                }
+                if (document.getElementById('crud-item')) document.getElementById('crud-item').style.display = 'none';
+                if (document.getElementById('pedidos-item')) document.getElementById('pedidos-item').style.display = 'none';
+            }
+            // Chama a função para carregar os carros ao carregar a página
+            carregarCarros();
+        };
+    
+        // Função de logout
+        async function logout() {
+            const res = await fetch('http://localhost:3000/api/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+    
+            if (res.ok) {
+                window.location.href = './Login/login.html';
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Falha ao fazer logout.'
+                });
+            }
+        }
+
+        // Variável global para guardar os carros já carregados
+        let carrosCache = []; 
+
+        async function carregarCarros() {
+            try {
+                const res = await fetch('http://localhost:3000/api/carros');
+                const carros = await res.json();
+                carrosCache = carros; // Guarda os carros
+                mostrarCarros(carros);
+            } catch (error) {
+                console.error('Erro ao carregar carros:', error);
+            }
+        }
+
+        function mostrarCarros(carros) {
+            // O alvo agora é o div que conterá os "cart-container" dinâmicos
+            const lista = document.getElementById('carros-listagem-container'); 
+            if (!lista) {
+                console.error("Elemento 'carros-listagem-container' não encontrado.");
+                return;
+            }
+            lista.innerHTML = ''; // Limpa a lista
+
+            carros.forEach(carro => {
+                // Cada item da lista será um div com a classe 'cart-container'
+                const item = document.createElement('div');
+                item.classList.add('cart-container'); 
+
+                item.innerHTML = `
+                    <div class="car-photo">
+                        <img src="${carro.imagem}" alt="${carro.nome}">
+                    </div>
+                    <div class="car-info">
+                        <div class="info-item">
+                            <strong>Nome do Carro:</strong>
+                            <input type="text" value="${carro.nome}" disabled>
+                        </div>
+                        <div class="info-item">
+                            <strong>Valor:</strong>
+                            <input type="text" value="R$ ${parseFloat(carro.preco).toFixed(2)}" disabled>
+                        </div>
+                        <div class="buttons">
+                            <a href="striker.html?id=${carro.id}" class="ver-btn">Ver Carro</a>
+                            <button class="comprar-btn">Comprar</button>
+                        </div>
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+        }
+
+        // Função para filtrar carros pelo nome
+        function filtrarCarros() {
+            const buscaInput = document.getElementById('buscaCarro');
+            if (!buscaInput) return; // Garante que o input existe
+
+            const texto = buscaInput.value.toLowerCase();
+            const filtrados = carrosCache.filter(carro => carro.nome.toLowerCase().includes(texto));
+            mostrarCarros(filtrados);
+        }
+
+        // Evento para capturar a digitação no input de busca
+        document.getElementById('buscaCarro')?.addEventListener('input', filtrarCarros);
+
+        // Script para o botão "Voltar ao Topo"
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) { // Mostra o botão após rolar 200px
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
 </body>
 </html>
