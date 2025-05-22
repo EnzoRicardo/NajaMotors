@@ -31,6 +31,12 @@
 
         <label for="cpf">CPF:</label>
         <input type="text" id="cpf" name="cpf" value="557.834.920-00" required>
+        
+        
+        <label for="datanasc">Data Nascimento:</label>
+        <input type="text" id="datanasc" name="datanasc" required>
+
+
 
         <label for="senha">Senha:</label>
         <input type="password" id="senha" name="senha" value="Teste@123" required>
@@ -104,11 +110,12 @@
             const confirmarSenha = document.getElementById('confirmarSenha').value;
             const nome = document.getElementById('nome').value;
             const cpf = document.getElementById('cpf').value;
+            const datanasc = document.getElementById('datanasc').value;
 
             let erro = "";
 
             switch (true) {
-                case !nome || !email || !cpf || !senha || !confirmarSenha:
+                case !nome || !email || !cpf || !datanasc || !senha || !confirmarSenha:
                     erro = "Os campos são obrigatórios.";
                     break;
                 case senha !== confirmarSenha:
@@ -156,7 +163,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ nome, email, cpf, senha })
+                body: JSON.stringify({ nome, email, cpf, datanasc, senha })
             });
 
             const result = await response.json();
