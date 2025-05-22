@@ -14,10 +14,38 @@ body {
 
 nav {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     background-color: #911924;
     height: 10vh;
+    padding: 0 35px;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    gap: 60px;
+    margin-left: 100px;
+}
+
+.nav-list li {
+    letter-spacing: 1px;
+    transition: 0.3s ease;
+}
+
+li:hover a {
+    transform: scale(1.1);
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 400;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    display: inline-block;
 }
 
 .logo img {
@@ -28,71 +56,114 @@ nav {
 }
 
 .crud-container {
-    width: 90%;
-    max-width: 1000px;
-    margin: 100px auto;
-    background-color: #000;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
-    margin-left: 10px;
+    max-width: 95%;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: #111;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(145, 25, 36, 0.6);
 }
 
+/* TITULO */
 .crud-container h2 {
     color: #911924;
-    font-size: 32px;
     text-align: center;
-    margin-right: -598px;
-    margin-bottom: 30px;
-    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-size: 2.2rem;
 }
 
-/* Wrapper da tabela para scroll horizontal em telas pequenas */
+/* BOTÃO */
+.cadastrar {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.cadastrar:hover {
+    background-color: #e0a800;
+}
+
+/* WRAPPER DA TABELA */
 .table-wrapper {
-    overflow-x: auto;
-    margin-top: 20px;
-}
-
-table {
     width: 100%;
-    min-width: 600px; /* Ajuda o scroll horizontal */
-    border-collapse: collapse;
-    text-align: left;
+    overflow-x: auto;
+    background-color: #1a1a1a;
+    border-radius: 8px;
 }
 
-th, td {
-    padding: 15px;
+/* TABELA */
+table {
+    min-width: 1200px;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1a1a1a;
+}
+
+thead {
+    background-color: #911924;
+}
+
+thead th {
+    padding: 12px;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+tbody tr {
     border-bottom: 1px solid #333;
 }
 
-th {
+tbody tr:hover {
+    background-color: #2a2a2a;
+}
+
+tbody td {
+    padding: 10px 12px;
+    color: #eee;
+    white-space: nowrap;
+}
+
+/* BOTÕES DA TABELA */
+td button {
+    background-color: transparent;
+    border: 1px solid #911924;
     color: #911924;
-    text-transform: uppercase;
-    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 5px;
 }
 
-td {
-    font-size: 14px;
+td button:hover {
+    background-color: #911924;
+    color: white;
 }
 
+/* BOTÕES EXTERNOS */
 button.cadastrar,
 button.editar,
 button.deletar {
-    padding: 8px 12px;
+    padding: 8px 16px;
     border: none;
     border-radius: 20px;
     color: white;
     cursor: pointer;
     font-weight: bold;
-    margin-right: 5px;
     transition: 0.3s;
 }
 
 button.cadastrar {
     background-color: orange;
-    display: block;
-    margin: 0 auto 20px;
-    margin-right: 132px;
 }
 
 button.editar {
@@ -118,6 +189,7 @@ button.cadastrar:hover {
     transform: scale(1.05);
 }
 
+/* SWAL MODAL */
 .swal2-select.swal2-input {
     width: 63%;
     height: 57px;
@@ -125,7 +197,7 @@ button.cadastrar:hover {
     margin: 18px auto;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: white; /* igual ao fundo dos inputs */
+    background-color: white;
     color: black;
     font-size: 19px;
     box-sizing: border-box;
@@ -139,6 +211,7 @@ button.cadastrar:hover {
     border-color: #911924;
 }
 
+/* BOTÃO COMUM */
 .btn {
     display: inline-block;
     padding: 20px 40px;
@@ -157,69 +230,34 @@ button.cadastrar:hover {
     transform: scale(1.1);
 }
 
-.nav-list {
-    list-style: none;
-    display: flex;
-    gap: 120px;
-    margin-left: 250px;
-}
 
-.nav-list li {
-    letter-spacing: 1px;
-    transition: 0.3 ease;
-}
-
-li:hover a { 
-    transform: scale(1.10);
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #911924;
-    height: 10vh;
-    padding: 0 35px;
-    position: relative;
-}
-a {
-    color: #fff;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: 400;
-    padding: 10px 20px;
-    border-radius: 25px;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    display: inline-block;
-}
-
-
-/* RESPONSIVIDADE */
 @media (max-width: 768px) {
-    .crud-container {
-        padding: 20px;
-        margin-top: 60px;
+    .logo {
+        left: 50%;
+        transform: translateX(-50%);
+        position: relative;
+        display: flex;
+        justify-content: center;
+        z-index: 10;
     }
 
     .logo img {
         width: 150px;
-        max-height: 180px;
+        height: auto;
     }
 
-    th, td {
-        font-size: 13px;
-        padding: 10px;
+    header {
+        height: 8vh;
+        justify-content: center;
     }
 
-    button.cadastrar {
-        font-size: 14px;
-        padding: 10px 16px;
+    .crud-container {
+        padding: 15px;
+        margin-top: 170px;
     }
 
-    button.editar,
-    button.deletar {
-        font-size: 13px;
-        padding: 6px 10px;
+    .crud-container h2 {
+        font-size: 1.5rem;
     }
 }
 

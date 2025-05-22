@@ -30,30 +30,32 @@
     <div class="crud-container">
         <h2>Lista de Carros</h2>
         <button class="cadastrar" onclick="cadastrarCarro()">Cadastrar</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ano</th>
-                    <th>Preço</th>
-                    <th>Modelo</th>
-                    <th>Marca</th>
-                    <th>Velocidade Máxima</th>
-                    <th>Aceleração</th>
-                    <th>Motor</th>
-                    <th>Cor</th>
-                    <th>Potência</th>
-                    <th>Cambio</th>
-                    <th>Torque</th>
-                    <th>Tração</th>
-                    <th>Consumo</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="carro-list">
-                <!-- Conteúdo dinâmico será inserido aqui via JavaScript -->
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ano</th>
+                        <th>Preço</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Velocidade Máxima</th>
+                        <th>Aceleração</th>
+                        <th>Motor</th>
+                        <th>Cor</th>
+                        <th>Potência</th>
+                        <th>Câmbio</th>
+                        <th>Torque</th>
+                        <th>Tração</th>
+                        <th>Consumo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="carro-list">
+                    <!-- Conteúdo gerado pelo JS -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
