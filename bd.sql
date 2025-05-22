@@ -142,6 +142,7 @@ WHERE Carro.id = 2;
 
 SELECT * FROM Texto;
 
+SELECT * FROM Marca;
 
 SELECT 
     Carro.id AS id,
@@ -170,5 +171,14 @@ JOIN Modelo ON Carro.modelo_id = Modelo.id
 JOIN Marca ON Modelo.marca_id = Marca.id
 LEFT JOIN Texto ON Texto.carro_id = Carro.id;
 
-
-
+SELECT * FROM usuario;
+ 
+SELECT * FROM pedido;
+ 
+SELECT Pedido.id AS pedido_id, Modelo.nome AS modelo, Marca.nome AS marca, Carro.imagem
+FROM Pedido
+JOIN Pedido_Carro ON Pedido.id = Pedido_Carro.pedido_id
+JOIN Carro ON Pedido_Carro.carro_id = Carro.id
+JOIN Modelo ON Carro.modelo_id = Modelo.id
+JOIN Marca ON Modelo.marca_id = Marca.id
+WHERE Pedido.usuario_id = ?;
