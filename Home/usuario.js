@@ -1,5 +1,3 @@
-// usuario.js
-
 window.onload = async () => {
     const res = await fetch('/api/usuario2');
     const user = await res.json();
@@ -10,8 +8,7 @@ window.onload = async () => {
     const foto = document.getElementById('foto-usuario');
     foto.src = user.imagemBase64 
         ? `data:image/jpeg;base64,${user.imagemBase64}`
-        : 'IMG/user.png'; // Caminho da imagem padrão
-
+        : 'IMG/user.png';
 };
 
 async function salvarAlteracoes() {
@@ -21,15 +18,34 @@ async function salvarAlteracoes() {
     const confirmarSenha = document.getElementById('confirmar-senha').value;
     const imagem = document.getElementById('upload-photo').files[0];
 
+    const senhaForteRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
     if (novaSenha && novaSenha !== confirmarSenha) {
-        alert('A nova senha e a confirmação não coincidem.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'A nova senha e a confirmação não coincidem.'
+        });
+        return;
+    }
+
+    if (novaSenha && !senhaForteRegex.test(novaSenha)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Senha Fraca',
+            html: 'A nova senha deve conter pelo menos:<br>• 8 caracteres<br>• 1 letra maiúscula<br>• 1 número<br>• 1 caractere especial'
+        });
         return;
     }
 
     const formData = new FormData();
     if (novaSenha) {
         if (!senhaAtual) {
-            alert('Digite a senha atual para mudar a senha.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Senha Atual Necessária',
+                text: 'Digite a senha atual para mudar a senha.'
+            });
             return;
         }
         formData.append('senhaAtual', senhaAtual);
@@ -45,11 +61,16 @@ async function salvarAlteracoes() {
     });
 
     const data = await res.json();
-    alert(data.message);
 
-    if (res.ok) {
-        window.location.reload(); // Atualiza a página
-    }
+    Swal.fire({
+        icon: res.ok ? 'success' : 'error',
+        title: res.ok ? 'Sucesso' : 'Erro',
+        text: data.message
+    }).then(() => {
+        if (res.ok) {
+            window.location.reload();
+        }
+    });
 }
 
 
@@ -67,9 +88,8 @@ document.getElementById('upload-photo').addEventListener('change', function (eve
     if (file) {
         const reader = new FileReader();
         reader.onload = function (e) {
-            preview.src = e.target.result; // Mostra a imagem escolhida localmente
+            preview.src = e.target.result;
         };
-        reader.readAsDataURL(file); // Lê o arquivo como base64 (imagem temporária)
+        reader.readAsDataURL(file);
     }
 });
-
